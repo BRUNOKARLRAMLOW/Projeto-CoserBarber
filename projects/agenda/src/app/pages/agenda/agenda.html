@@ -1,0 +1,448 @@
+<div class="agenda-page">
+
+  <!-- ── Cabeçalho ─────────────────────────────────────────── -->
+  <div class="agenda-header">
+    <div class="container">
+      <h1 class="section-title">Agendar <span>Horário</span></h1>
+      <span class="accent-divider" aria-hidden="true"></span>
+      <p class="section-subtitle">Escolha o serviço, o dia e o horário ideal para você.</p>
+    </div>
+  </div>
+
+  <div class="container agenda-body">
+
+    <!-- ── Tela de Sucesso ─────────────────────────────────── -->
+    @if (agendado()) {
+      <div class="success-card" role="alert" aria-live="assertive">
+        <div class="success-card__icon" aria-hidden="true">
+          <i class="fa-solid fa-circle-check"></i>
+        </div>
+        <h2 class="success-card__title">Agendamento Confirmado!</h2>
+        <p class="success-card__greeting">Até logo, <strong>{{ nomeAgendado() }}</strong>!</p>
+
+        <dl class="success-card__details">
+          @if (servicoAgendado(); as s) {
+            <div class="success-card__detail">
+              <dt><i class="fa-solid fa-scissors" aria-hidden="true"></i> Serviço</dt>
+              <dd>{{ s.nome }} — {{ formatarPreco(precoPago()) }}</dd>
+            </div>
+          }
+          <div class="success-card__detail">
+            <dt><i class="fa-solid fa-user-tie" aria-hidden="true"></i> Barbeiro</dt>
+            <dd>{{ barbeiroAgendado() }}</dd>
+          </div>
+          <div class="success-card__detail">
+            <dt><i class="fa-regular fa-calendar" aria-hidden="true"></i> Data</dt>
+            <dd>{{ dataAgendada() }}</dd>
+          </div>
+          <div class="success-card__detail">
+            <dt><i class="fa-regular fa-clock" aria-hidden="true"></i> Horário</dt>
+            <dd>{{ horarioAgendado() }}</dd>
+          </div>
+          @if (telefoneAgendado()) {
+            <div class="success-card__detail">
+              <dt><i class="fa-solid fa-phone" aria-hidden="true"></i> Telefone</dt>
+              <dd>{{ telefoneAgendado() }}</dd>
+            </div>
+          }
+        </dl>
+
+        <button type="button" class="btn-primary" (click)="novoAgendamento()">
+          <i class="fa-solid fa-plus" aria-hidden="true"></i>
+          Novo Agendamento
+        </button>
+      </div>
+    }
+
+    <!-- ── Formulário ──────────────────────────────────────── -->
+    @if (!agendado()) {
+      
+      <!-- Card Informativo do Plano Ativo -->
+      @if (auth.currentUser(); as user) {
+        @if (user.plan && user.plan !== 'none') {
+          <div class="user-plan-card" [class]="'user-plan-card--' + user.plan">
+            <div class="user-plan-card__icon" aria-hidden="true">
+              <i class="fa-solid" [class.fa-crown]="user.plan === 'vip'" [class.fa-award]="user.plan === 'gold'" [class.fa-star]="user.plan === 'silver'"></i>
+            </div>
+            <div class="user-plan-card__info">
+              <h3 class="user-plan-card__title">
+                Plano Ativo: <span class="plan-name">{{ user.plan | uppercase }}</span>
+              </h3>
+              <div class="user-plan-card__status">
+                @if (user.plan === 'silver') {
+                  <p style="margin: 0 0 0.35rem 0;">Você possui <strong>{{ user.planHaircutsLeft }} / 2</strong> cortes restantes neste ciclo.</p>
+                  <p class="plan-restriction-badge"><i class="fa-solid fa-calendar-day"></i> Agendamentos deste plano permitidos apenas de <strong>terça a quinta-feira</strong>.</p>
+                } @else if (user.plan === 'gold') {
+                  <p style="margin: 0 0 0.35rem 0;">Seu plano concede <strong>Cortes Ilimitados</strong> à vontade!</p>
+                  <p class="plan-restriction-badge"><i class="fa-solid fa-calendar-day"></i> Agendamentos deste plano permitidos apenas de <strong>terça a quinta-feira</strong>.</p>
+                } @else {
+                  <p style="margin: 0;">Seu plano concede <strong>Cortes Ilimitados</strong> à vontade!</p>
+                }
+              </div>
+            </div>
+          </div>
+        }
+      }
+
+      <form
+        class="agenda-form"
+        [formGroup]="form"
+        (ngSubmit)="confirmar()"
+        novalidate
+        aria-label="Formulário de agendamento"
+      >
+
+        <!-- 1. Escolha o Profissional -->
+        <div class="agenda-section">
+          <h2 class="agenda-section__title">
+            <span class="agenda-section__num">1</span> Escolha o Profissional
+          </h2>
+
+          <div class="barbeiro-grid">
+            <!-- Card Davi Coser -->
+            <button
+              type="button"
+              class="barbeiro-card"
+              [class.barbeiro-card--selected]="barbeiroSelecionado() === 'coser'"
+              (click)="selecionarBarbeiro('coser')"
+              aria-label="Selecionar Davi Coser"
+            >
+              <div class="barbeiro-card__avatar">
+                <i class="fa-solid fa-user"></i>
+              </div>
+              <div class="barbeiro-card__info">
+                <h3 class="barbeiro-card__name">Davi Coser</h3>
+                <div class="barbeiro-card__hours">
+                  @for (tag of obterHorariosDescricao('coser'); track tag) {
+                    <span class="hours-tag"><i class="fa-regular fa-clock"></i> {{ tag }}</span>
+                  }
+                </div>
+              </div>
+              <div class="barbeiro-card__check" aria-hidden="true">
+                <i class="fa-solid fa-circle-check"></i>
+              </div>
+            </button>
+
+            <!-- Card Filippi -->
+            <button
+              type="button"
+              class="barbeiro-card"
+              [class.barbeiro-card--selected]="barbeiroSelecionado() === 'filippi'"
+              (click)="selecionarBarbeiro('filippi')"
+              aria-label="Selecionar Filippi"
+            >
+              <div class="barbeiro-card__avatar">
+                <i class="fa-solid fa-user"></i>
+              </div>
+              <div class="barbeiro-card__info">
+                <h3 class="barbeiro-card__name">Filippi</h3>
+                <div class="barbeiro-card__hours">
+                  @for (tag of obterHorariosDescricao('filippi'); track tag) {
+                    <span class="hours-tag"><i class="fa-regular fa-clock"></i> {{ tag }}</span>
+                  }
+                </div>
+              </div>
+              <div class="barbeiro-card__check" aria-hidden="true">
+                <i class="fa-solid fa-circle-check"></i>
+              </div>
+            </button>
+          </div>
+          @if (form.controls.barbeiroId.invalid && form.controls.barbeiroId.touched) {
+            <span class="form-error" role="alert">Escolha um profissional para prosseguir.</span>
+          }
+        </div>
+
+        <!-- 2. Dados do cliente -->
+        <div class="agenda-section">
+          <h2 class="agenda-section__title">
+            <span class="agenda-section__num">2</span> Seus dados
+          </h2>
+
+          <div class="agenda-section__fields">
+            <div class="form-group">
+              <label for="clienteNome" class="form-label">Nome completo</label>
+              <input
+                id="clienteNome"
+                type="text"
+                class="form-input"
+                formControlName="clienteNome"
+                placeholder="Ex: João Silva"
+                autocomplete="given-name"
+              >
+              @if (form.controls.clienteNome.invalid && form.controls.clienteNome.touched) {
+                <span class="form-error" role="alert">
+                  @if (form.controls.clienteNome.errors?.['required']) { Informe seu nome. }
+                  @else { Mínimo de 2 caracteres. }
+                </span>
+              }
+            </div>
+
+            @if (!auth.currentUser()) {
+              <div class="form-group">
+                <label for="clienteTelefone" class="form-label">Telefone / WhatsApp</label>
+                <input
+                  id="clienteTelefone"
+                  type="tel"
+                  class="form-input"
+                  formControlName="clienteTelefone"
+                  placeholder="Ex: (11) 99999-9999"
+                  autocomplete="tel"
+                >
+                @if (form.controls.clienteTelefone.invalid && form.controls.clienteTelefone.touched) {
+                  <span class="form-error" role="alert">Informe seu telefone para contato.</span>
+                }
+              </div>
+            }
+
+            <div class="form-group">
+              <label for="servicoId" class="form-label">Serviço</label>
+              <select id="servicoId" class="form-input" formControlName="servicoId">
+                <option value="" disabled>— Selecione um serviço —</option>
+                @for (s of servicos$ | async; track s.id) {
+                  <option [value]="s.id">
+                    {{ s.nome }} · {{ formatarPreco(obterPrecoFinalServico(s)) }} · {{ s.duracaoMinutos }} min
+                  </option>
+                }
+              </select>
+              @if (form.controls.servicoId.invalid && form.controls.servicoId.touched) {
+                <span class="form-error" role="alert">Selecione um serviço.</span>
+              }
+
+              <!-- Dica de Cobertura do Plano -->
+              @if (auth.currentUser(); as user) {
+                @if (user.plan && user.plan !== 'none' && form.controls.servicoId.value; as svcId) {
+                  <p class="plan-coverage-hint">
+                    @if (svcId === '2') {
+                      <!-- Barba (não coberto) -->
+                      <span class="text-secondary">
+                        <i class="fa-solid fa-circle-info" aria-hidden="true"></i>
+                        O serviço de Barba não está incluso no plano e será cobrado no preço normal.
+                      </span>
+                    } @else if (svcId === '3') {
+                      <!-- Corte + Barba -->
+                      @if (user.plan === 'silver') {
+                        @if ((user.planHaircutsLeft ?? 0) > 0) {
+                          <i class="fa-solid fa-circle-check text-success" aria-hidden="true"></i>
+                          A parte do Corte é coberta pelo plano! O combo fica por <strong>metade do preço ({{ formatarPreco(30) }})</strong> e consumirá <strong>1 crédito Silver</strong>.
+                        } @else {
+                          <span class="text-danger">
+                            <i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i>
+                            Você esgotou os créditos Silver. O combo será cobrado no preço normal avulso.
+                          </span>
+                        }
+                      } @else {
+                        <i class="fa-solid fa-circle-check text-success" aria-hidden="true"></i>
+                        A parte do Corte é coberta! O combo fica por <strong>metade do preço ({{ formatarPreco(30) }})</strong>.
+                      }
+                    } @else if (svcId === '1') {
+                      <!-- Corte comum -->
+                      @if (user.plan === 'silver') {
+                        @if ((user.planHaircutsLeft ?? 0) > 0) {
+                          <i class="fa-solid fa-circle-check text-success" aria-hidden="true"></i>
+                          Este agendamento consumirá <strong>1 de seus {{ user.planHaircutsLeft }} créditos</strong> do plano Silver.
+                        } @else {
+                          <span class="text-danger">
+                            <i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i>
+                            Você esgotou os créditos Silver. Este corte será cobrado de forma avulsa.
+                          </span>
+                        }
+                      } @else {
+                        <i class="fa-solid fa-circle-check text-success" aria-hidden="true"></i>
+                        Este agendamento é <strong>totalmente coberto</strong> pelo seu plano {{ user.plan | uppercase }}!
+                      }
+                    }
+                  </p>
+                }
+              }
+            </div>
+          </div>
+        </div>
+
+        <!-- 3. Escolha a data -->
+        <div class="agenda-section" [class.agenda-section--disabled]="!barbeiroSelecionado() || !servicoSelecionado()">
+          <h2 class="agenda-section__title">
+            <span class="agenda-section__num">3</span> Escolha a data
+          </h2>
+
+          @if (!barbeiroSelecionado() || !servicoSelecionado()) {
+            <p class="agenda-hint agenda-hint--warn">
+              <i class="fa-solid fa-circle-info" aria-hidden="true"></i>
+              Selecione o profissional e o serviço primeiro para liberar o calendário.
+            </p>
+          }
+
+          <div class="calendar" role="region" aria-label="Calendário de agendamento">
+
+            <!-- Navegação do mês -->
+            <div class="cal-nav">
+              <button
+                type="button"
+                class="cal-nav__btn"
+                (click)="prevMonth()"
+                [disabled]="!canGoPrev() || !barbeiroSelecionado() || !servicoSelecionado()"
+                aria-label="Mês anterior"
+              >
+                <i class="fa-solid fa-chevron-left" aria-hidden="true"></i>
+              </button>
+              <h3 class="cal-nav__label">{{ mesAno() }}</h3>
+              <button
+                type="button"
+                class="cal-nav__btn"
+                (click)="nextMonth()"
+                [disabled]="!barbeiroSelecionado() || !servicoSelecionado()"
+                aria-label="Próximo mês"
+              >
+                <i class="fa-solid fa-chevron-right" aria-hidden="true"></i>
+              </button>
+            </div>
+
+            <!-- Cabeçalho dos dias da semana -->
+            <div class="cal-weekdays" aria-hidden="true">
+              <span>Seg</span>
+              <span>Ter</span>
+              <span>Qua</span>
+              <span>Qui</span>
+              <span>Sex</span>
+              <span class="cal-weekdays__sat">Sáb</span>
+              <span class="cal-weekdays__sun">Dom</span>
+            </div>
+
+            <!-- Grade de dias -->
+            <div class="cal-grid" role="grid" aria-label="Dias do mês">
+              @for (day of calendarDays(); track ($index)) {
+                @if (day === null) {
+                  <div class="cal-cell cal-cell--empty" role="gridcell" aria-hidden="true"></div>
+                } @else if (day.isClosed) {
+                  <div
+                    class="cal-cell cal-cell--closed"
+                    role="gridcell"
+                    [attr.aria-label]="day.day + ' - fechado'"
+                    aria-disabled="true"
+                  >
+                    <span class="cal-cell__num">{{ day.day }}</span>
+                  </div>
+                } @else if (day.isPast) {
+                  <div
+                    class="cal-cell cal-cell--past"
+                    role="gridcell"
+                    [attr.aria-label]="day.day + ' - data passada'"
+                    aria-disabled="true"
+                  >
+                    <span class="cal-cell__num">{{ day.day }}</span>
+                  </div>
+                } @else if (day.isFull) {
+                  <div
+                    class="cal-cell cal-cell--full"
+                    role="gridcell"
+                    [attr.aria-label]="day.day + ' - lotado'"
+                    aria-disabled="true"
+                  >
+                    <span class="cal-cell__num">{{ day.day }}</span>
+                  </div>
+                } @else {
+                  <button
+                    type="button"
+                    class="cal-cell cal-cell--available"
+                    [class.cal-cell--today]="day.isToday"
+                    [class.cal-cell--selected]="selectedDate() === day.date"
+                    [class.cal-cell--sat]="day.isSaturday"
+                    role="gridcell"
+                    [attr.aria-selected]="selectedDate() === day.date"
+                    [attr.aria-label]="day.day + (day.isSaturday ? ' (sábado, 08:00–16:00)' : '')"
+                    [disabled]="!barbeiroSelecionado() || !servicoSelecionado()"
+                    (click)="selectDay(day)"
+                  >
+                    <span class="cal-cell__num">{{ day.day }}</span>
+                    @if (day.isToday) {
+                      <span class="cal-cell__today-dot" aria-hidden="true"></span>
+                    }
+                  </button>
+                }
+              }
+            </div>
+
+            <!-- Legenda -->
+            <div class="cal-legend" aria-label="Legenda do calendário">
+              <span class="cal-legend__item">
+                <span class="cal-legend__dot cal-legend__dot--today"></span>Hoje
+              </span>
+              <span class="cal-legend__item">
+                <span class="cal-legend__dot cal-legend__dot--sat"></span>Sáb (08–16h)
+              </span>
+              <span class="cal-legend__item">
+                <span class="cal-legend__dot cal-legend__dot--closed"></span>Fechado (Dom e Seg)
+              </span>
+              <span class="cal-legend__item">
+                <span class="cal-legend__dot cal-legend__dot--full"></span>Lotado
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 4. Horários -->
+        @if (selectedDate() && barbeiroSelecionado() && servicoSelecionado()) {
+          <div class="agenda-section">
+            <h2 class="agenda-section__title">
+              <span class="agenda-section__num">4</span> Horário disponível
+            </h2>
+
+            @if (horariosDisponiveis().length === 0) {
+              <p class="agenda-hint agenda-hint--warn">
+                <i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i>
+                Nenhum horário disponível para este dia. Escolha outra data.
+              </p>
+            } @else {
+              <div
+                class="chip-group"
+                role="radiogroup"
+                aria-labelledby="horario-label"
+                aria-required="true"
+              >
+                <span id="horario-label" class="visually-hidden">Selecione um horário</span>
+                @for (h of baseSlotsDoDia(); track h) {
+                  <label
+                    class="chip"
+                    [class.chip--selected]="form.controls.horario.value === h"
+                    [class.chip--booked]="!horariosDisponiveis().includes(h)"
+                  >
+                    <input
+                      type="radio"
+                      [name]="'horario-radio'"
+                      [value]="h"
+                      [checked]="form.controls.horario.value === h"
+                      [disabled]="!horariosDisponiveis().includes(h)"
+                      (change)="selecionarHorario(h)"
+                      [attr.aria-label]="'Horário ' + h + (horariosDisponiveis().includes(h) ? '' : ' - ocupado')"
+                    >
+                    {{ h }} - {{ obterFimSlot(h, servicoSelecionado()) }}
+                  </label>
+                }
+              </div>
+            }
+
+            @if (form.controls.horario.invalid && form.controls.horario.touched) {
+              <span class="form-error" role="alert">Selecione um horário.</span>
+            }
+          </div>
+        }
+
+        <!-- Botão de confirmação -->
+        <button
+          type="submit"
+          class="btn-primary agenda-form__submit"
+          [disabled]="form.invalid || !selectedDate() || salvando()"
+        >
+          @if (salvando()) {
+            <i class="fa-solid fa-spinner fa-spin" aria-hidden="true"></i>
+            Processando...
+          } @else {
+            <i class="fa-solid fa-check" aria-hidden="true"></i>
+            Confirmar Agendamento
+          }
+        </button>
+
+      </form>
+    }
+
+  </div>
+</div>

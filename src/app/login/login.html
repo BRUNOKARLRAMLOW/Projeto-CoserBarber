@@ -1,0 +1,114 @@
+<div class="login-container">
+  <div class="glass-card">
+    <div class="login-header">
+      <div class="brand-logo">
+        <span class="logo-coser">Coser</span>
+        <span class="logo-barber">Barber</span>
+      </div>
+      <h1>{{ isSignUp() ? 'Criar sua Conta' : 'Acesso do Cliente' }}</h1>
+      <p>{{ isSignUp() ? 'Preencha seus dados para começar' : 'Entre com suas credenciais para gerenciar seus agendamentos' }}</p>
+    </div>
+
+    <form (ngSubmit)="onSubmit()" class="login-form">
+      @if (errorMessage()) {
+        <div class="alert-error">
+          <span class="icon">⚠️</span>
+          {{ errorMessage() }}
+        </div>
+      }
+
+      @if (isSignUp()) {
+        <!-- Nome Completo -->
+        <div class="form-group">
+          <label for="name">Nome Completo</label>
+          <div class="input-wrapper">
+            <span class="input-icon">👤</span>
+            <input id="name" type="text" [(ngModel)]="name" name="name" placeholder="Seu nome completo" required [disabled]="isLoading()" />
+          </div>
+        </div>
+
+        <!-- Telefone -->
+        <div class="form-group">
+          <label for="phone">Telefone / Celular</label>
+          <div class="input-wrapper">
+            <span class="input-icon">📞</span>
+            <input id="phone" type="tel" [(ngModel)]="phoneNumber" (input)="formatPhone($event)" name="phone" placeholder="(00) 99999-9999" maxlength="15" required [disabled]="isLoading()" />
+          </div>
+        </div>
+      }
+
+      <!-- E-mail -->
+      <div class="form-group">
+        <label for="email">E-mail</label>
+        <div class="input-wrapper">
+          <span class="input-icon">✉️</span>
+          <input id="email" type="email" [(ngModel)]="email" name="email" placeholder="seu@email.com" required [disabled]="isLoading()" />
+        </div>
+      </div>
+
+      <!-- Senha -->
+      <div class="form-group">
+        <label for="password">Senha</label>
+        <div class="input-wrapper">
+          <span class="input-icon">🔒</span>
+          <input id="password" [type]="showPassword() ? 'text' : 'password'" [(ngModel)]="password" name="password" placeholder="••••••••" required [disabled]="isLoading()" />
+          <button type="button" class="toggle-password-btn" tabindex="-1" (click)="togglePasswordVisibility()">
+            {{ showPassword() ? '🙈' : '👁️' }}
+          </button>
+        </div>
+      </div>
+
+      @if (isSignUp()) {
+        <!-- Confirmar Senha -->
+        <div class="form-group" [class.has-error]="!passwordsMatch">
+          <label for="confirmPassword">Confirmar Senha</label>
+          <div class="input-wrapper">
+            <span class="input-icon">🔒</span>
+            <input id="confirmPassword" [type]="showConfirmPassword() ? 'text' : 'password'" [(ngModel)]="confirmPassword" name="confirmPassword" placeholder="••••••••" required [disabled]="isLoading()" />
+            <button type="button" class="toggle-password-btn" tabindex="-1" (click)="toggleConfirmPasswordVisibility()">
+              {{ showConfirmPassword() ? '🙈' : '👁️' }}
+            </button>
+          </div>
+          @if (!passwordsMatch) {
+            <div class="field-error">
+              <small>As senhas não coincidem.</small>
+            </div>
+          }
+        </div>
+
+        <!-- Termos de Aceite LGPD -->
+        <div class="form-group lgpd-checkbox-group">
+          <label class="checkbox-label">
+            <input type="checkbox" [(ngModel)]="lgpdAccepted" name="lgpdAccepted" [disabled]="isLoading()" required>
+            <span>
+              Compreendo e aceito os Termos de Uso e concordo com o processamento dos meus dados para fins de agendamento na Coser Barber.
+            </span>
+          </label>
+        </div>
+      }
+
+      <button type="submit" class="btn-primary" [disabled]="isLoading() || (isSignUp() && !passwordsMatch)">
+        @if (isLoading()) {
+          <span class="loader"></span>
+          {{ isSignUp() ? 'Criando Conta...' : 'Autenticando...' }}
+        } @else {
+          {{ isSignUp() ? 'Cadastrar' : 'Entrar' }}
+        }
+      </button>
+
+      <div class="divider">
+        <span>OU</span>
+      </div>
+
+      <div class="extra-actions">
+        <button type="button" class="btn-outline" (click)="toggleSignUp()" [disabled]="isLoading()">
+          {{ isSignUp() ? 'Já tenho uma conta' : 'Criar uma nova conta' }}
+        </button>
+      </div>
+    </form>
+
+    <div class="footer-links">
+      <a routerLink="/home" class="back-link">← Voltar para o Início</a>
+    </div>
+  </div>
+</div>

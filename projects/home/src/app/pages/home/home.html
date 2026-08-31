@@ -1,0 +1,135 @@
+<!-- ── Hero ───────────────────────────────────────────────── -->
+<section class="hero" aria-label="Apresentação da barbearia">
+  <div class="hero__glow" aria-hidden="true"></div>
+
+  <div class="hero__content container">
+    <p class="hero__eyebrow">Bem-vindo à</p>
+    <h1 class="hero__title">
+      Coser<span class="hero__title--accent">'s</span><br>Barber
+    </h1>
+    <p class="hero__subtitle">
+      Estilo, precisão e tradição.<br>
+      O melhor corte começa com um bom agendamento.
+    </p>
+
+    <div class="hero__actions">
+      <a routerLink="/agenda" class="btn-accent">
+        <i class="fa-solid fa-scissors" aria-hidden="true"></i>
+        Agendar Horário
+      </a>
+      <a [href]="instagramUrl" target="_blank" rel="noopener noreferrer"
+         class="btn-outline-accent"
+         aria-label="Siga a Coser Barber no Instagram (abre em nova aba)">
+        <i class="fa-brands fa-instagram" aria-hidden="true"></i>
+        Siga no Instagram
+      </a>
+    </div>
+
+    <div class="hero__stats" aria-label="Números da barbearia">
+      <div class="hero__stat">
+        <span class="hero__stat-number">500+</span>
+        <span class="hero__stat-label">Clientes atendidos</span>
+      </div>
+      <div class="hero__stat-divider" aria-hidden="true"></div>
+      <div class="hero__stat">
+        <span class="hero__stat-number">5★</span>
+        <span class="hero__stat-label">Avaliação média</span>
+      </div>
+      <div class="hero__stat-divider" aria-hidden="true"></div>
+      <div class="hero__stat">
+        <span class="hero__stat-number">{{ anosExperiencia }}</span>
+        <span class="hero__stat-label">Anos de experiência</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="hero__scroll-hint" aria-hidden="true">
+    <i class="fa-solid fa-chevron-down"></i>
+  </div>
+</section>
+
+<!-- ── Galeria ────────────────────────────────────────────── -->
+<section class="gallery section" aria-labelledby="gallery-heading">
+  <div class="container">
+    <h2 id="gallery-heading" class="section-title">
+      Nossos <span>Trabalhos</span>
+    </h2>
+    <span class="accent-divider" aria-hidden="true"></span>
+    <p class="section-subtitle">
+      Cada corte é uma obra. Confira alguns dos trabalhos da nossa equipe.
+    </p>
+
+    <div class="gallery__grid" role="list">
+      @for (foto of galeria; track foto.src) {
+        <figure class="gallery__item" role="listitem">
+          <img
+            src="{{ foto.src }}"
+            alt="{{ foto.alt }}"
+            class="gallery__img"
+            loading="lazy"
+          >
+          <figcaption class="gallery__overlay" aria-hidden="true">
+            <span class="gallery__categoria">{{ foto.categoria }}</span>
+          </figcaption>
+        </figure>
+      }
+    </div>
+  </div>
+</section>
+
+<!-- ── Serviços ───────────────────────────────────────────── -->
+<section class="services section" aria-labelledby="services-heading">
+  <div class="container">
+    <h2 id="services-heading" class="section-title">
+      Nossos <span>Serviços</span>
+    </h2>
+    <span class="accent-divider" aria-hidden="true"></span>
+    <p class="section-subtitle">
+      Cada detalhe importa. Escolha o serviço ideal e saia com um visual impecável.
+    </p>
+
+    <div class="services__grid" role="list">
+      @for (servico of servicos$ | async; track servico.id) {
+        <article class="service-card" role="listitem">
+          <h3 class="service-card__name">{{ servico.nome }}</h3>
+          <p class="service-card__desc">{{ servico.descricao }}</p>
+          <div class="service-card__meta">
+            <span class="service-card__price">{{ formatarPreco(servico.preco) }}</span>
+            <span class="service-card__duration">
+              <i class="fa-regular fa-clock" aria-hidden="true"></i>
+              <span>{{ servico.duracaoMinutos }} min</span>
+            </span>
+          </div>
+          <a routerLink="/agenda" class="service-card__cta">
+            Agendar este serviço
+            <i class="fa-solid fa-arrow-right" style="margin-left:0.375rem" aria-hidden="true"></i>
+          </a>
+        </article>
+      }
+    </div>
+  </div>
+</section>
+
+<!-- ── CTA Final ──────────────────────────────────────────── -->
+<section class="cta-section section" aria-labelledby="cta-heading">
+  <div class="container">
+    <div class="cta-card">
+      <h2 id="cta-heading" class="cta-card__title">
+        Pronto para um novo visual?
+      </h2>
+      <p class="cta-card__text">
+        Agende agora mesmo e garanta seu horário com a gente.
+      </p>
+      <div class="cta-card__actions">
+        <a routerLink="/agenda" class="btn-primary">
+          <i class="fa-solid fa-scissors" aria-hidden="true"></i>
+          Fazer Agendamento
+        </a>
+        <a routerLink="/contato" class="btn-outline">
+          <i class="fa-brands fa-whatsapp" aria-hidden="true"></i>
+          Falar pelo WhatsApp
+        </a>
+      </div>
+    </div>
+  </div>
+</section>

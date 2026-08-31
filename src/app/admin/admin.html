@@ -1,0 +1,1267 @@
+<div class="admin-page">
+
+  <!-- ── 0. TELA DE CARREGAMENTO / LOADING STATE ──────────────────── -->
+  @if (isAuthInitializing()) {
+    <div class="admin-loading-container">
+      <div class="admin-loader-card">
+        <div class="spinner-orbit">
+          <div class="spinner-circle spinner-circle--outer"></div>
+          <div class="spinner-circle spinner-circle--inner"></div>
+          <i class="fa-solid fa-scissors spinner-icon"></i>
+        </div>
+        <h2 class="admin-loader-title">Verificando sessão...</h2>
+        <p class="admin-loader-subtitle">Carregando o painel de forma segura</p>
+      </div>
+    </div>
+  }
+  <!-- ── 1. TELA DE LOGIN ─────────────────────────────────────── -->
+  @else if (!isAuthenticated()) {
+    <div class="login-container">
+      <div class="login-card">
+        <div class="login-card__header">
+          <div class="login-card__icon" aria-hidden="true">
+            <i class="fa-solid fa-lock"></i>
+          </div>
+          <h1 class="login-card__title">Área do Barbeiro</h1>
+          <p class="login-card__subtitle">Acesse para gerenciar os agendamentos da barbearia</p>
+        </div>
+
+        <form [formGroup]="loginForm" (ngSubmit)="login()" class="login-form" novalidate>
+          <div class="form-group">
+            <label for="email" class="form-label">E-mail</label>
+            <div class="input-wrapper">
+              <i class="fa-solid fa-envelope input-icon" aria-hidden="true"></i>
+              <input
+                id="email"
+                type="email"
+                class="form-input form-input--icon"
+                formControlName="email"
+                placeholder="barbeiro@coserbarber.com.br"
+                autocomplete="email"
+              >
+            </div>
+            @if (loginForm.controls.email.invalid && loginForm.controls.email.touched) {
+              <span class="form-error" role="alert">
+                @if (loginForm.controls.email.errors?.['required']) { Informe o e-mail. }
+                @else { E-mail inválido. }
+              </span>
+            }
+          </div>
+
+          <div class="form-group">
+            <label for="password" class="form-label">Senha</label>
+            <div class="input-wrapper">
+              <i class="fa-solid fa-key input-icon" aria-hidden="true"></i>
+              <input
+                id="password"
+                type="password"
+                class="form-input form-input--icon"
+                formControlName="password"
+                placeholder="Sua senha"
+                autocomplete="current-password"
+              >
+            </div>
+            @if (loginForm.controls.password.invalid && loginForm.controls.password.touched) {
+              <span class="form-error" role="alert">Informe a senha.</span>
+            }
+          </div>
+
+          @if (loginError()) {
+            <div class="alert alert--error" role="alert">
+              <i class="fa-solid fa-circle-exclamation" aria-hidden="true"></i>
+              <span>{{ loginError() }}</span>
+            </div>
+          }
+
+          <button type="submit" class="btn-accent login-submit">
+            <i class="fa-solid fa-arrow-right-to-bracket" aria-hidden="true"></i>
+            Entrar no Painel
+          </button>
+        </form>
+      </div>
+    </div>
+  }
+
+  <!-- ── 2. DASHBOARD ADMINISTRATIVO ───────────────────────────── -->
+  @else {
+    <div class="dashboard container">
+      
+      <!-- Cabeçalho Dashboard -->
+      <header class="db-header">
+        <div class="db-header__left">
+          <h1 class="db-header__title">Painel de {{ loggedBarber() === 'coser' ? 'Davi Coser' : 'Filippi' }}</h1>
+          <p class="db-header__subtitle">Gerenciamento e controle em tempo real</p>
+          
+          <!-- Abas de Navegação Principal -->
+          <div class="db-navigation-tabs">
+            <button type="button" class="db-nav-tab" [class.db-nav-tab--active]="activeAdminTab() === 'agenda'" (click)="activeAdminTab.set('agenda')">
+              <i class="fa-solid fa-calendar-days" aria-hidden="true"></i> Agenda Diária
+            </button>
+            <button type="button" class="db-nav-tab" [class.db-nav-tab--active]="activeAdminTab() === 'clientes'" (click)="activeAdminTab.set('clientes')">
+              <i class="fa-solid fa-users" aria-hidden="true"></i> Clientes & Planos
+            </button>
+            <button type="button" class="db-nav-tab" [class.db-nav-tab--active]="activeAdminTab() === 'expediente'" (click)="activeAdminTab.set('expediente')">
+              <i class="fa-solid fa-clock" aria-hidden="true"></i> Meu Expediente
+            </button>
+          </div>
+        </div>
+        <button type="button" class="btn-outline-accent db-header__logout" (click)="logout()">
+          <i class="fa-solid fa-right-from-bracket" aria-hidden="true"></i>
+          Sair
+        </button>
+      </header>
+
+      <!-- ── ABA A: AGENDA DIÁRIA ── -->
+      @if (activeAdminTab() === 'agenda') {
+        <!-- Cartões de Estatísticas -->
+        <section class="db-stats" aria-label="Estatísticas gerais">
+          
+          <div class="stat-card">
+            <div class="stat-card__icon stat-card__icon--blue" aria-hidden="true">
+              <i class="fa-solid fa-calendar-check"></i>
+            </div>
+            <div class="stat-card__info">
+              <span class="stat-card__label">Total Agendamentos</span>
+              <strong class="stat-card__value">{{ totalAgendamentos() }}</strong>
+            </div>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-card__icon stat-card__icon--gold" aria-hidden="true">
+              <i class="fa-solid fa-dollar-sign"></i>
+            </div>
+            <div class="stat-card__info">
+              <span class="stat-card__label">Faturamento Estimado</span>
+              <strong class="stat-card__value">{{ formatarPreco(faturamentoEstimado()) }}</strong>
+            </div>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-card__icon stat-card__icon--green" aria-hidden="true">
+              <i class="fa-solid fa-clock"></i>
+            </div>
+            <div class="stat-card__info">
+              <span class="stat-card__label">Tempo de Trabalho</span>
+              <strong class="stat-card__value">{{ tempoTrabalhoEstimado() }} min</strong>
+            </div>
+          </div>
+
+        </section>
+
+        <!-- Seção Principal de Listagem -->
+        <section class="db-content" aria-labelledby="bookings-heading">
+          
+          <div class="db-content__header">
+            <h2 id="bookings-heading" class="db-content__title">
+              <i class="fa-solid fa-scissors text-accent" aria-hidden="true"></i>
+              Agenda & Cronograma Diário
+            </h2>
+
+            <div style="display: flex; gap: 1rem; align-items: center; flex-wrap: wrap;">
+              <button type="button" class="btn-accent admin-special-booking-btn" (click)="abrirModalAgendamentoEspecial()">
+                <i class="fa-solid fa-user-plus" aria-hidden="true"></i>
+                Agendamento Especial
+              </button>
+
+              @if (loggedBarber() === null) {
+                <!-- Filtro de Barbeiro (Tabs) -->
+                <div class="db-tabs" role="tablist" aria-label="Filtrar por barbeiro" style="margin-bottom: 0;">
+                <button
+                  type="button"
+                  class="db-tabs__btn"
+                  [class.db-tabs__btn--active]="barbeiroFiltro() === 'all'"
+                  (click)="barbeiroFiltro.set('all')"
+                  role="tab"
+                  [attr.aria-selected]="barbeiroFiltro() === 'all'"
+                >
+                  Todos
+                </button>
+                <button
+                  type="button"
+                  class="db-tabs__btn"
+                  [class.db-tabs__btn--active]="barbeiroFiltro() === 'coser'"
+                  (click)="barbeiroFiltro.set('coser')"
+                  role="tab"
+                  [attr.aria-selected]="barbeiroFiltro() === 'coser'"
+                >
+                  Davi Coser
+                </button>
+                <button
+                  type="button"
+                  class="db-tabs__btn"
+                  [class.db-tabs__btn--active]="barbeiroFiltro() === 'filippi'"
+                  (click)="barbeiroFiltro.set('filippi')"
+                  role="tab"
+                  [attr.aria-selected]="barbeiroFiltro() === 'filippi'"
+                >
+                  Filippi
+                </button>
+              </div>
+            }
+            </div>
+          </div>
+
+          <div class="db-schedule-grid">
+            
+            <!-- ── COLUNA ESQUERDA: MINI-CALENDÁRIO ── -->
+            <div class="db-schedule-grid__left">
+              <div class="mini-calendar">
+                <!-- Navegação do mês -->
+                <div class="mcal-nav">
+                  <button type="button" class="mcal-nav__btn" (click)="prevMonth()" aria-label="Mês anterior">
+                    <i class="fa-solid fa-chevron-left" aria-hidden="true"></i>
+                  </button>
+                  <h3 class="mcal-nav__label">{{ mesAno() }}</h3>
+                  <button type="button" class="mcal-nav__btn" (click)="nextMonth()" aria-label="Próximo mês">
+                    <i class="fa-solid fa-chevron-right" aria-hidden="true"></i>
+                  </button>
+                </div>
+
+                <!-- Dias da Semana -->
+                <div class="mcal-weekdays">
+                  <span>Seg</span>
+                  <span>Ter</span>
+                  <span>Qua</span>
+                  <span>Qui</span>
+                  <span>Sex</span>
+                  <span class="sat">Sáb</span>
+                  <span class="sun">Dom</span>
+                </div>
+
+                <!-- Grade de Dias -->
+                <div class="mcal-grid">
+                  @for (day of calendarDays(); track ($index)) {
+                    @if (day === null) {
+                      <div class="mcal-cell mcal-cell--empty"></div>
+                    } @else {
+                      <button
+                        type="button"
+                        class="mcal-cell mcal-cell--day"
+                        [class.mcal-cell--selected]="filtroData() === day.date"
+                        [class.mcal-cell--today]="day.isToday"
+                        [class.mcal-cell--closed]="day.isClosed"
+                        (click)="selecionarDia(day.date)"
+                      >
+                        <span class="mcal-cell__num">{{ day.day }}</span>
+                        @if (day.temAgendamento) {
+                          <span class="mcal-cell__dot" aria-hidden="true"></span>
+                        }
+                      </button>
+                    }
+                  }
+                </div>
+              </div>
+            </div>
+
+            <!-- ── COLUNA DIREITA: LINHA DO TEMPO DIÁRIA ── -->
+            <div class="db-schedule-grid__right">
+              <div class="timeline-header">
+                <h3 class="timeline-header__title">
+                  <i class="fa-regular fa-calendar-days text-accent" aria-hidden="true"></i>
+                  Agenda de {{ formatarData(filtroData()) }}
+                </h3>
+              </div>
+
+              @if (isDiaClosed()) {
+                <div class="db-empty-state" style="padding: 3rem 1rem;">
+                  <div class="db-empty-state__icon" aria-hidden="true">
+                    <i class="fa-solid fa-mug-hot"></i>
+                  </div>
+                  <h3 class="db-empty-state__title">Barbearia Fechada</h3>
+                  <p class="db-empty-state__text">
+                    A barbearia está fechada às segundas-feiras e domingos. Aproveite o descanso!
+                  </p>
+                </div>
+              } @else {
+                
+                <div class="timeline-wrapper">
+                  
+                  <!-- TIMELINE: DAVI COSER -->
+                  @if (barbeiroFiltro() === 'all' || barbeiroFiltro() === 'coser') {
+                    <div class="timeline-barber-col">
+                      <h4 class="timeline-barber-col__title">
+                        <span class="timeline-barber-col__badge timeline-barber-col__badge--coser">DC</span>
+                        Davi Coser
+                      </h4>
+
+                      <div class="timeline-slots-list">
+                        @for (slot of coserTimeline(); track slot.horario) {
+                          
+                          <!-- Slot Livre -->
+                          @if (!slot.agendamento && !slot.isContinuation) {
+                            <div class="timeline-slot timeline-slot--free">
+                              <span class="timeline-slot__time">{{ slot.horario }}</span>
+                              <span class="timeline-slot__status">Livre</span>
+                            </div>
+                          }
+
+                          <!-- Slot Ocupado (Direto) -->
+                          @if (slot.agendamento; as a) {
+                            <div
+                              class="timeline-slot timeline-slot--booked"
+                              [class.timeline-slot--expanded]="slotExpandido() === a.id"
+                              (click)="toggleExpandirSlot(a.id, a)"
+                              role="button"
+                              [attr.aria-expanded]="slotExpandido() === a.id"
+                            >
+                              <div class="timeline-slot__main">
+                                <span class="timeline-slot__time">{{ slot.horario }}</span>
+                                <span class="timeline-slot__client">
+                                  <i class="fa-solid fa-user" aria-hidden="true"></i>
+                                  {{ a.clienteNome }}
+                                  @if (a.categoriaEspecial === 'idoso') {
+                                    <span class="special-badge special-badge--idoso" title="Cliente Idoso(a)"><i class="fa-solid fa-person-cane" aria-hidden="true"></i> Idoso</span>
+                                  } @else if (a.categoriaEspecial === 'pcd') {
+                                    <span class="special-badge special-badge--pcd" title="Cliente PCD"><i class="fa-solid fa-wheelchair" aria-hidden="true"></i> PCD</span>
+                                  } @else if (a.categoriaEspecial === 'vip') {
+                                    <span class="special-badge special-badge--vip" title="Cliente VIP / Importante"><i class="fa-solid fa-crown" aria-hidden="true"></i> VIP</span>
+                                  } @else if (a.categoriaEspecial === 'outro') {
+                                    <span class="special-badge special-badge--outro" title="Cliente Especial"><i class="fa-solid fa-star" aria-hidden="true"></i> Especial</span>
+                                  }
+                                </span>
+                                <i class="fa-solid fa-chevron-down timeline-slot__arrow" aria-hidden="true"></i>
+                              </div>
+
+                              @if (slotExpandido() === a.id) {
+                                <div class="timeline-detail-card" (click)="$event.stopPropagation();">
+                                  <dl class="detail-list">
+                                    <div>
+                                      <dt>Cliente</dt>
+                                      <dd style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+                                        {{ a.clienteNome }}
+                                        @if (a.categoriaEspecial === 'idoso') {
+                                          <span class="special-badge special-badge--idoso" title="Cliente Idoso(a)"><i class="fa-solid fa-person-cane" aria-hidden="true"></i> Idoso</span>
+                                        } @else if (a.categoriaEspecial === 'pcd') {
+                                          <span class="special-badge special-badge--pcd" title="Cliente PCD"><i class="fa-solid fa-wheelchair" aria-hidden="true"></i> PCD</span>
+                                        } @else if (a.categoriaEspecial === 'vip') {
+                                          <span class="special-badge special-badge--vip" title="Cliente VIP / Importante"><i class="fa-solid fa-crown" aria-hidden="true"></i> VIP</span>
+                                        } @else if (a.categoriaEspecial === 'outro') {
+                                          <span class="special-badge special-badge--outro" title="Cliente Especial"><i class="fa-solid fa-star" aria-hidden="true"></i> Especial</span>
+                                        }
+                                      </dd>
+                                    </div>
+                                    <div>
+                                      <dt>Serviço</dt>
+                                      <dd>{{ obterServicoNome(a.servicoId) }}</dd>
+                                    </div>
+                                    <div>
+                                      <dt>Horário</dt>
+                                      <dd>{{ a.horario }} - {{ a.servicoId === '3' ? 'Combo (60 min)' : '30 min' }}</dd>
+                                    </div>
+                                    @if (a.clienteTelefone) {
+                                      <div>
+                                        <dt>Telefone</dt>
+                                        <dd>{{ a.clienteTelefone }}</dd>
+                                      </div>
+                                    }
+                                  </dl>
+
+                                  <div class="products-section">
+                                    <h5 class="products-title">
+                                      <i class="fa-solid fa-cart-shopping" aria-hidden="true"></i> Produtos Comprados
+                                    </h5>
+                                    
+                                    <div class="products-list-edit">
+                                      <!-- Linha Fixa de Serviço -->
+                                      <div class="product-edit-row">
+                                        <div class="product-input-group">
+                                          <label class="product-label">Serviço / Item</label>
+                                          <input type="text" [value]="obterServicoNome(a.servicoId)" class="product-input" readonly disabled style="opacity: 0.6; cursor: not-allowed;">
+                                        </div>
+                                        <div class="product-input-group product-input-group--qty">
+                                          <label class="product-label">Qtd</label>
+                                          <input type="number" value="1" class="product-input" readonly disabled style="opacity: 0.6; cursor: not-allowed;">
+                                        </div>
+                                        <div class="product-input-group product-input-group--val">
+                                          <label class="product-label">Valor do Serviço (R$)</label>
+                                          <input 
+                                            type="text" 
+                                            inputmode="numeric" 
+                                            class="product-input" 
+                                            [value]="obterPrecoEditando(a.id, a)"
+                                            (input)="aoDigitarPrecoServico($event, a.id)"
+                                            placeholder="0,00"
+                                          >
+                                        </div>
+                                        <div style="width: 32px; flex-shrink: 0;"></div>
+                                      </div>
+
+                                      @for (prod of obterProdutosEditando(a.id, a); track $index; let idx = $index) {
+                                        <div class="product-edit-row">
+                                          <div class="product-input-group">
+                                            <input type="text" placeholder="Ex: Pomada" [(ngModel)]="prod.nome" class="product-input">
+                                          </div>
+                                          <div class="product-input-group product-input-group--qty">
+                                            <input type="number" placeholder="1" [(ngModel)]="prod.quantidade" class="product-input" min="1">
+                                          </div>
+                                          <div class="product-input-group product-input-group--val">
+                                            <input type="text" inputmode="numeric" placeholder="0,00" [value]="formatarMoedaExibicao(prod.valor)" (input)="aoDigitarValor($event, prod)" class="product-input">
+                                          </div>
+                                          <button type="button" class="btn-remove-product-row" (click)="removerLinhaProduto(a.id, idx)" title="Remover este produto">
+                                            <i class="fa-solid fa-trash-can" aria-hidden="true"></i>
+                                          </button>
+                                        </div>
+                                      }
+                                    </div>
+
+                                    <div class="products-actions-bar">
+                                      <button type="button" class="btn-outline-accent btn-add-product-row" (click)="adicionarLinhaProduto(a.id)">
+                                        <i class="fa-solid fa-plus" aria-hidden="true"></i> Adicionar Produto
+                                      </button>
+                                      
+                                      <button type="button" class="btn-accent btn-save-products" (click)="salvarProdutosDinamico(a.id)">
+                                        <i class="fa-solid fa-floppy-disk" aria-hidden="true"></i> Salvar
+                                      </button>
+                                    </div>
+                                  </div>
+
+                                  <button
+                                    type="button"
+                                    class="btn-delete timeline-detail-card__cancel"
+                                    (click)="cancelarAgendamento(a.id, a.clienteNome)"
+                                  >
+                                    <i class="fa-solid fa-trash-can" aria-hidden="true"></i>
+                                    Cancelar Horário
+                                  </button>
+                                </div>
+                              }
+                            </div>
+                          }
+
+                          <!-- Slot Ocupado (Continuação de Combo) -->
+                          @if (slot.isContinuation && slot.continuationOf; as combo) {
+                            <div
+                              class="timeline-slot timeline-slot--continuation"
+                              [class.timeline-slot--expanded]="slotExpandido() === combo.id"
+                              (click)="toggleExpandirSlot(combo.id, combo)"
+                              role="button"
+                              [attr.aria-expanded]="slotExpandido() === combo.id"
+                            >
+                              <div class="timeline-slot__main">
+                                <span class="timeline-slot__time">{{ slot.horario }}</span>
+                                <span class="timeline-slot__client timeline-slot__client--continuation">
+                                  <i class="fa-regular fa-clock" aria-hidden="true"></i>
+                                  [Continuação] {{ combo.clienteNome }}
+                                  @if (combo.categoriaEspecial === 'idoso') {
+                                    <span class="special-badge special-badge--idoso" title="Cliente Idoso(a)"><i class="fa-solid fa-person-cane" aria-hidden="true"></i> Idoso</span>
+                                  } @else if (combo.categoriaEspecial === 'pcd') {
+                                    <span class="special-badge special-badge--pcd" title="Cliente PCD"><i class="fa-solid fa-wheelchair" aria-hidden="true"></i> PCD</span>
+                                  } @else if (combo.categoriaEspecial === 'vip') {
+                                    <span class="special-badge special-badge--vip" title="Cliente VIP / Importante"><i class="fa-solid fa-crown" aria-hidden="true"></i> VIP</span>
+                                  } @else if (combo.categoriaEspecial === 'outro') {
+                                    <span class="special-badge special-badge--outro" title="Cliente Especial"><i class="fa-solid fa-star" aria-hidden="true"></i> Especial</span>
+                                  }
+                                </span>
+                                <i class="fa-solid fa-chevron-down timeline-slot__arrow" aria-hidden="true"></i>
+                              </div>
+
+                              @if (slotExpandido() === combo.id) {
+                                <div class="timeline-detail-card" (click)="$event.stopPropagation();">
+                                  <dl class="detail-list">
+                                    <div>
+                                      <dt>Cliente</dt>
+                                      <dd style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+                                        {{ combo.clienteNome }}
+                                        @if (combo.categoriaEspecial === 'idoso') {
+                                          <span class="special-badge special-badge--idoso" title="Cliente Idoso(a)"><i class="fa-solid fa-person-cane" aria-hidden="true"></i> Idoso</span>
+                                        } @else if (combo.categoriaEspecial === 'pcd') {
+                                          <span class="special-badge special-badge--pcd" title="Cliente PCD"><i class="fa-solid fa-wheelchair" aria-hidden="true"></i> PCD</span>
+                                        } @else if (combo.categoriaEspecial === 'vip') {
+                                          <span class="special-badge special-badge--vip" title="Cliente VIP / Importante"><i class="fa-solid fa-crown" aria-hidden="true"></i> VIP</span>
+                                        } @else if (combo.categoriaEspecial === 'outro') {
+                                          <span class="special-badge special-badge--outro" title="Cliente Especial"><i class="fa-solid fa-star" aria-hidden="true"></i> Especial</span>
+                                        }
+                                      </dd>
+                                    </div>
+                                    <div>
+                                      <dt>Serviço</dt>
+                                      <dd>{{ obterServicoNome(combo.servicoId) }}</dd>
+                                    </div>
+                                    <div>
+                                      <dt>Horário</dt>
+                                      <dd>{{ combo.horario }} (Início) · Combo 1h</dd>
+                                    </div>
+                                    @if (combo.clienteTelefone) {
+                                      <div>
+                                        <dt>Telefone</dt>
+                                        <dd>{{ combo.clienteTelefone }}</dd>
+                                      </div>
+                                    }
+                                  </dl>
+
+                                  <div class="products-section">
+                                    <h5 class="products-title">
+                                      <i class="fa-solid fa-cart-shopping" aria-hidden="true"></i> Produtos Comprados
+                                    </h5>
+                                    
+                                    <div class="products-list-edit">
+                                      <!-- Linha Fixa de Serviço -->
+                                      <div class="product-edit-row">
+                                        <div class="product-input-group">
+                                          <label class="product-label">Serviço / Item</label>
+                                          <input type="text" [value]="obterServicoNome(combo.servicoId)" class="product-input" readonly disabled style="opacity: 0.6; cursor: not-allowed;">
+                                        </div>
+                                        <div class="product-input-group product-input-group--qty">
+                                          <label class="product-label">Qtd</label>
+                                          <input type="number" value="1" class="product-input" readonly disabled style="opacity: 0.6; cursor: not-allowed;">
+                                        </div>
+                                        <div class="product-input-group product-input-group--val">
+                                          <label class="product-label">Valor do Serviço (R$)</label>
+                                          <input 
+                                            type="text" 
+                                            inputmode="numeric" 
+                                            class="product-input" 
+                                            [value]="obterPrecoEditando(combo.id, combo)"
+                                            (input)="aoDigitarPrecoServico($event, combo.id)"
+                                            placeholder="0,00"
+                                          >
+                                        </div>
+                                        <div style="width: 32px; flex-shrink: 0;"></div>
+                                      </div>
+
+                                      @for (prod of obterProdutosEditando(combo.id, combo); track $index; let idx = $index) {
+                                        <div class="product-edit-row">
+                                          <div class="product-input-group">
+                                            <input type="text" placeholder="Ex: Pomada" [(ngModel)]="prod.nome" class="product-input">
+                                          </div>
+                                          <div class="product-input-group product-input-group--qty">
+                                            <input type="number" placeholder="1" [(ngModel)]="prod.quantidade" class="product-input" min="1">
+                                          </div>
+                                          <div class="product-input-group product-input-group--val">
+                                            <input type="text" inputmode="numeric" placeholder="0,00" [value]="formatarMoedaExibicao(prod.valor)" (input)="aoDigitarValor($event, prod)" class="product-input">
+                                          </div>
+                                          <button type="button" class="btn-remove-product-row" (click)="removerLinhaProduto(combo.id, idx)" title="Remover este produto">
+                                            <i class="fa-solid fa-trash-can" aria-hidden="true"></i>
+                                          </button>
+                                        </div>
+                                      }
+                                    </div>
+
+                                    <div class="products-actions-bar">
+                                      <button type="button" class="btn-outline-accent btn-add-product-row" (click)="adicionarLinhaProduto(combo.id)">
+                                        <i class="fa-solid fa-plus" aria-hidden="true"></i> Adicionar Produto
+                                      </button>
+                                      
+                                      <button type="button" class="btn-accent btn-save-products" (click)="salvarProdutosDinamico(combo.id)">
+                                        <i class="fa-solid fa-floppy-disk" aria-hidden="true"></i> Salvar
+                                      </button>
+                                    </div>
+                                  </div>
+
+                                  <button
+                                    type="button"
+                                    class="btn-delete timeline-detail-card__cancel"
+                                    (click)="cancelarAgendamento(combo.id, combo.clienteNome)"
+                                  >
+                                    <i class="fa-solid fa-trash-can" aria-hidden="true"></i>
+                                    Cancelar Horário
+                                  </button>
+                                </div>
+                              }
+                            </div>
+                          }
+
+                        }
+                      </div>
+                    </div>
+                  }
+
+                  <!-- TIMELINE: FILIPPI -->
+                  @if (barbeiroFiltro() === 'all' || barbeiroFiltro() === 'filippi') {
+                    <div class="timeline-barber-col">
+                      <h4 class="timeline-barber-col__title">
+                        <span class="timeline-barber-col__badge timeline-barber-col__badge--filippi">FL</span>
+                        Filippi
+                      </h4>
+
+                      <div class="timeline-slots-list">
+                        @for (slot of filippiTimeline(); track slot.horario) {
+                          
+                          <!-- Slot Livre -->
+                          @if (!slot.agendamento && !slot.isContinuation) {
+                            <div class="timeline-slot timeline-slot--free">
+                              <span class="timeline-slot__time">{{ slot.horario }}</span>
+                              <span class="timeline-slot__status">Livre</span>
+                            </div>
+                          }
+
+                          <!-- Slot Ocupado (Direto) -->
+                          @if (slot.agendamento; as a) {
+                            <div
+                              class="timeline-slot timeline-slot--booked"
+                              [class.timeline-slot--expanded]="slotExpandido() === a.id"
+                              (click)="toggleExpandirSlot(a.id, a)"
+                              role="button"
+                              [attr.aria-expanded]="slotExpandido() === a.id"
+                            >
+                              <div class="timeline-slot__main">
+                                <span class="timeline-slot__time">{{ slot.horario }}</span>
+                                <span class="timeline-slot__client">
+                                  <i class="fa-solid fa-user" aria-hidden="true"></i>
+                                  {{ a.clienteNome }}
+                                  @if (a.categoriaEspecial === 'idoso') {
+                                    <span class="special-badge special-badge--idoso" title="Cliente Idoso(a)"><i class="fa-solid fa-person-cane" aria-hidden="true"></i> Idoso</span>
+                                  } @else if (a.categoriaEspecial === 'pcd') {
+                                    <span class="special-badge special-badge--pcd" title="Cliente PCD"><i class="fa-solid fa-wheelchair" aria-hidden="true"></i> PCD</span>
+                                  } @else if (a.categoriaEspecial === 'vip') {
+                                    <span class="special-badge special-badge--vip" title="Cliente VIP / Importante"><i class="fa-solid fa-crown" aria-hidden="true"></i> VIP</span>
+                                  } @else if (a.categoriaEspecial === 'outro') {
+                                    <span class="special-badge special-badge--outro" title="Cliente Especial"><i class="fa-solid fa-star" aria-hidden="true"></i> Especial</span>
+                                  }
+                                </span>
+                                <i class="fa-solid fa-chevron-down timeline-slot__arrow" aria-hidden="true"></i>
+                              </div>
+
+                              @if (slotExpandido() === a.id) {
+                                <div class="timeline-detail-card" (click)="$event.stopPropagation();">
+                                  <dl class="detail-list">
+                                    <div>
+                                      <dt>Cliente</dt>
+                                      <dd style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+                                        {{ a.clienteNome }}
+                                        @if (a.categoriaEspecial === 'idoso') {
+                                          <span class="special-badge special-badge--idoso" title="Cliente Idoso(a)"><i class="fa-solid fa-person-cane" aria-hidden="true"></i> Idoso</span>
+                                        } @else if (a.categoriaEspecial === 'pcd') {
+                                          <span class="special-badge special-badge--pcd" title="Cliente PCD"><i class="fa-solid fa-wheelchair" aria-hidden="true"></i> PCD</span>
+                                        } @else if (a.categoriaEspecial === 'vip') {
+                                          <span class="special-badge special-badge--vip" title="Cliente VIP / Importante"><i class="fa-solid fa-crown" aria-hidden="true"></i> VIP</span>
+                                        } @else if (a.categoriaEspecial === 'outro') {
+                                          <span class="special-badge special-badge--outro" title="Cliente Especial"><i class="fa-solid fa-star" aria-hidden="true"></i> Especial</span>
+                                        }
+                                      </dd>
+                                    </div>
+                                    <div>
+                                      <dt>Serviço</dt>
+                                      <dd>{{ obterServicoNome(a.servicoId) }}</dd>
+                                    </div>
+                                    <div>
+                                      <dt>Horário</dt>
+                                      <dd>{{ a.horario }} - {{ a.servicoId === '3' ? 'Combo (60 min)' : '30 min' }}</dd>
+                                    </div>
+                                    @if (a.clienteTelefone) {
+                                      <div>
+                                        <dt>Telefone</dt>
+                                        <dd>{{ a.clienteTelefone }}</dd>
+                                      </div>
+                                    }
+                                  </dl>
+
+                                  <div class="products-section">
+                                    <h5 class="products-title">
+                                      <i class="fa-solid fa-cart-shopping" aria-hidden="true"></i> Produtos Comprados
+                                    </h5>
+                                    
+                                    <div class="products-list-edit">
+                                      <!-- Linha Fixa de Serviço -->
+                                      <div class="product-edit-row">
+                                        <div class="product-input-group">
+                                          <label class="product-label">Serviço / Item</label>
+                                          <input type="text" [value]="obterServicoNome(a.servicoId)" class="product-input" readonly disabled style="opacity: 0.6; cursor: not-allowed;">
+                                        </div>
+                                        <div class="product-input-group product-input-group--qty">
+                                          <label class="product-label">Qtd</label>
+                                          <input type="number" value="1" class="product-input" readonly disabled style="opacity: 0.6; cursor: not-allowed;">
+                                        </div>
+                                        <div class="product-input-group product-input-group--val">
+                                          <label class="product-label">Valor do Serviço (R$)</label>
+                                          <input 
+                                            type="text" 
+                                            inputmode="numeric" 
+                                            class="product-input" 
+                                            [value]="obterPrecoEditando(a.id, a)"
+                                            (input)="aoDigitarPrecoServico($event, a.id)"
+                                            placeholder="0,00"
+                                          >
+                                        </div>
+                                        <div style="width: 32px; flex-shrink: 0;"></div>
+                                      </div>
+
+                                      @for (prod of obterProdutosEditando(a.id, a); track $index; let idx = $index) {
+                                        <div class="product-edit-row">
+                                          <div class="product-input-group">
+                                            <input type="text" placeholder="Ex: Pomada" [(ngModel)]="prod.nome" class="product-input">
+                                          </div>
+                                          <div class="product-input-group product-input-group--qty">
+                                            <input type="number" placeholder="1" [(ngModel)]="prod.quantidade" class="product-input" min="1">
+                                          </div>
+                                          <div class="product-input-group product-input-group--val">
+                                            <input type="text" inputmode="numeric" placeholder="0,00" [value]="formatarMoedaExibicao(prod.valor)" (input)="aoDigitarValor($event, prod)" class="product-input">
+                                          </div>
+                                          <button type="button" class="btn-remove-product-row" (click)="removerLinhaProduto(a.id, idx)" title="Remover este produto">
+                                            <i class="fa-solid fa-trash-can" aria-hidden="true"></i>
+                                          </button>
+                                        </div>
+                                      }
+                                    </div>
+
+                                    <div class="products-actions-bar">
+                                      <button type="button" class="btn-outline-accent btn-add-product-row" (click)="adicionarLinhaProduto(a.id)">
+                                        <i class="fa-solid fa-plus" aria-hidden="true"></i> Adicionar Produto
+                                      </button>
+                                      
+                                      <button type="button" class="btn-accent btn-save-products" (click)="salvarProdutosDinamico(a.id)">
+                                        <i class="fa-solid fa-floppy-disk" aria-hidden="true"></i> Salvar
+                                      </button>
+                                    </div>
+                                  </div>
+
+                                  <button
+                                    type="button"
+                                    class="btn-delete timeline-detail-card__cancel"
+                                    (click)="cancelarAgendamento(a.id, a.clienteNome)"
+                                  >
+                                    <i class="fa-solid fa-trash-can" aria-hidden="true"></i>
+                                    Cancelar Horário
+                                  </button>
+                                </div>
+                              }
+                            </div>
+                          }
+
+                          <!-- Slot Ocupado (Continuação de Combo) -->
+                          @if (slot.isContinuation && slot.continuationOf; as combo) {
+                            <div
+                              class="timeline-slot timeline-slot--continuation"
+                              [class.timeline-slot--expanded]="slotExpandido() === combo.id"
+                              (click)="toggleExpandirSlot(combo.id, combo)"
+                              role="button"
+                              [attr.aria-expanded]="slotExpandido() === combo.id"
+                            >
+                              <div class="timeline-slot__main">
+                                <span class="timeline-slot__time">{{ slot.horario }}</span>
+                                <span class="timeline-slot__client timeline-slot__client--continuation">
+                                  <i class="fa-regular fa-clock" aria-hidden="true"></i>
+                                  [Continuação] {{ combo.clienteNome }}
+                                  @if (combo.categoriaEspecial === 'idoso') {
+                                    <span class="special-badge special-badge--idoso" title="Cliente Idoso(a)"><i class="fa-solid fa-person-cane" aria-hidden="true"></i> Idoso</span>
+                                  } @else if (combo.categoriaEspecial === 'pcd') {
+                                    <span class="special-badge special-badge--pcd" title="Cliente PCD"><i class="fa-solid fa-wheelchair" aria-hidden="true"></i> PCD</span>
+                                  } @else if (combo.categoriaEspecial === 'vip') {
+                                    <span class="special-badge special-badge--vip" title="Cliente VIP / Importante"><i class="fa-solid fa-crown" aria-hidden="true"></i> VIP</span>
+                                  } @else if (combo.categoriaEspecial === 'outro') {
+                                    <span class="special-badge special-badge--outro" title="Cliente Especial"><i class="fa-solid fa-star" aria-hidden="true"></i> Especial</span>
+                                  }
+                                </span>
+                                <i class="fa-solid fa-chevron-down timeline-slot__arrow" aria-hidden="true"></i>
+                              </div>
+
+                              @if (slotExpandido() === combo.id) {
+                                <div class="timeline-detail-card" (click)="$event.stopPropagation();">
+                                  <dl class="detail-list">
+                                    <div>
+                                      <dt>Cliente</dt>
+                                      <dd style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+                                        {{ combo.clienteNome }}
+                                        @if (combo.categoriaEspecial === 'idoso') {
+                                          <span class="special-badge special-badge--idoso" title="Cliente Idoso(a)"><i class="fa-solid fa-person-cane" aria-hidden="true"></i> Idoso</span>
+                                        } @else if (combo.categoriaEspecial === 'pcd') {
+                                          <span class="special-badge special-badge--pcd" title="Cliente PCD"><i class="fa-solid fa-wheelchair" aria-hidden="true"></i> PCD</span>
+                                        } @else if (combo.categoriaEspecial === 'vip') {
+                                          <span class="special-badge special-badge--vip" title="Cliente VIP / Importante"><i class="fa-solid fa-crown" aria-hidden="true"></i> VIP</span>
+                                        } @else if (combo.categoriaEspecial === 'outro') {
+                                          <span class="special-badge special-badge--outro" title="Cliente Especial"><i class="fa-solid fa-star" aria-hidden="true"></i> Especial</span>
+                                        }
+                                      </dd>
+                                    </div>
+                                    <div>
+                                      <dt>Serviço</dt>
+                                      <dd>{{ obterServicoNome(combo.servicoId) }}</dd>
+                                    </div>
+                                    <div>
+                                      <dt>Horário</dt>
+                                      <dd>{{ combo.horario }} (Início) · Combo 1h</dd>
+                                    </div>
+                                    @if (combo.clienteTelefone) {
+                                      <div>
+                                        <dt>Telefone</dt>
+                                        <dd>{{ combo.clienteTelefone }}</dd>
+                                      </div>
+                                    }
+                                  </dl>
+
+                                  <div class="products-section">
+                                    <h5 class="products-title">
+                                      <i class="fa-solid fa-cart-shopping" aria-hidden="true"></i> Produtos Comprados
+                                    </h5>
+                                    
+                                    <div class="products-list-edit">
+                                      <!-- Linha Fixa de Serviço -->
+                                      <div class="product-edit-row">
+                                        <div class="product-input-group">
+                                          <label class="product-label">Serviço / Item</label>
+                                          <input type="text" [value]="obterServicoNome(combo.servicoId)" class="product-input" readonly disabled style="opacity: 0.6; cursor: not-allowed;">
+                                        </div>
+                                        <div class="product-input-group product-input-group--qty">
+                                          <label class="product-label">Qtd</label>
+                                          <input type="number" value="1" class="product-input" readonly disabled style="opacity: 0.6; cursor: not-allowed;">
+                                        </div>
+                                        <div class="product-input-group product-input-group--val">
+                                          <label class="product-label">Valor do Serviço (R$)</label>
+                                          <input 
+                                            type="text" 
+                                            inputmode="numeric" 
+                                            class="product-input" 
+                                            [value]="obterPrecoEditando(combo.id, combo)"
+                                            (input)="aoDigitarPrecoServico($event, combo.id)"
+                                            placeholder="0,00"
+                                          >
+                                        </div>
+                                        <div style="width: 32px; flex-shrink: 0;"></div>
+                                      </div>
+
+                                      @for (prod of obterProdutosEditando(combo.id, combo); track $index; let idx = $index) {
+                                        <div class="product-edit-row">
+                                          <div class="product-input-group">
+                                            <input type="text" placeholder="Ex: Pomada" [(ngModel)]="prod.nome" class="product-input">
+                                          </div>
+                                          <div class="product-input-group product-input-group--qty">
+                                            <input type="number" placeholder="1" [(ngModel)]="prod.quantidade" class="product-input" min="1">
+                                          </div>
+                                          <div class="product-input-group product-input-group--val">
+                                            <input type="text" inputmode="numeric" placeholder="0,00" [value]="formatarMoedaExibicao(prod.valor)" (input)="aoDigitarValor($event, prod)" class="product-input">
+                                          </div>
+                                          <button type="button" class="btn-remove-product-row" (click)="removerLinhaProduto(combo.id, idx)" title="Remover este produto">
+                                            <i class="fa-solid fa-trash-can" aria-hidden="true"></i>
+                                          </button>
+                                        </div>
+                                      }
+                                    </div>
+
+                                    <div class="products-actions-bar">
+                                      <button type="button" class="btn-outline-accent btn-add-product-row" (click)="adicionarLinhaProduto(combo.id)">
+                                        <i class="fa-solid fa-plus" aria-hidden="true"></i> Adicionar Produto
+                                      </button>
+                                      
+                                      <button type="button" class="btn-accent btn-save-products" (click)="salvarProdutosDinamico(combo.id)">
+                                        <i class="fa-solid fa-floppy-disk" aria-hidden="true"></i> Salvar
+                                      </button>
+                                    </div>
+                                  </div>
+
+                                  <button
+                                    type="button"
+                                    class="btn-delete timeline-detail-card__cancel"
+                                    (click)="cancelarAgendamento(combo.id, combo.clienteNome)"
+                                  >
+                                    <i class="fa-solid fa-trash-can" aria-hidden="true"></i>
+                                    Cancelar Horário
+                                  </button>
+                                </div>
+                              }
+                            </div>
+                          }
+
+                        }
+                      </div>
+                    </div>
+                  }
+
+                </div>
+                
+              }
+            </div>
+
+          </div>
+        </section>
+      }
+
+      <!-- ── ABA B: CLIENTES & PLANOS ── -->
+      @if (activeAdminTab() === 'clientes') {
+        <section class="db-content" aria-labelledby="clients-heading">
+          <div class="db-content__header">
+            <h2 id="clients-heading" class="db-content__title">
+              <i class="fa-solid fa-users text-accent" aria-hidden="true"></i>
+              Gerenciamento de Clientes & Club de Planos
+            </h2>
+          </div>
+
+          <div class="clients-container-card">
+            <p class="clients-desc">
+              Visualize os clientes da barbearia, altere os planos ativos deles ou adicione saldo de cortes ao plano Silver com facilidade e em tempo real.
+            </p>
+
+            @if (clients().length === 0) {
+              <div class="db-empty-state" style="padding: 4rem 1rem;">
+                <div class="db-empty-state__icon" aria-hidden="true">
+                  <i class="fa-solid fa-user-slash"></i>
+                </div>
+                <h3 class="db-empty-state__title">Nenhum cliente cadastrado</h3>
+                <p class="db-empty-state__text">Ainda não existem clientes normais cadastrados no banco de dados.</p>
+              </div>
+            } @else {
+              <div class="clients-table-wrapper">
+                <table class="clients-table">
+                  <thead>
+                    <tr>
+                      <th>Cliente</th>
+                      <th>Contato</th>
+                      <th>Plano Ativo</th>
+                      <th>Ações de Plano</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    @for (client of clients(); track client.uid) {
+                      <tr>
+                        <!-- Nome e Cadastro -->
+                        <td>
+                          <div class="client-name-box">
+                            <strong class="client-name">{{ client.displayName }}</strong>
+                            <span class="client-date">Cadastrado em {{ formatarData(client.createdAt.split('T')[0]) }}</span>
+                          </div>
+                        </td>
+                        <!-- Contato -->
+                        <td>
+                          <div class="client-contact-box">
+                            <span class="client-email"><i class="fa-regular fa-envelope" aria-hidden="true"></i> {{ client.email }}</span>
+                            @if (client.phoneNumber) {
+                              <span class="client-phone"><i class="fa-solid fa-phone" aria-hidden="true"></i> {{ client.phoneNumber }}</span>
+                            }
+                          </div>
+                        </td>
+                        <!-- Plano Atual -->
+                        <td>
+                          <div class="client-plan-badge-box">
+                            @if (client.plan === 'silver') {
+                              <span class="admin-plan-badge admin-plan-badge--silver">
+                                <i class="fa-solid fa-star" aria-hidden="true"></i> Silver ({{ client.planHaircutsLeft ?? 0 }}/2 cortes)
+                              </span>
+                            } @else if (client.plan === 'gold') {
+                              <span class="admin-plan-badge admin-plan-badge--gold">
+                                <i class="fa-solid fa-award" aria-hidden="true"></i> Gold (Ilimitado)
+                              </span>
+                            } @else if (client.plan === 'vip') {
+                              <span class="admin-plan-badge admin-plan-badge--vip">
+                                <i class="fa-solid fa-crown" aria-hidden="true"></i> VIP (Ilimitado)
+                              </span>
+                            } @else {
+                              <span class="admin-plan-badge admin-plan-badge--none">Comum (Nenhum)</span>
+                            }
+                          </div>
+                        </td>
+                        <!-- Ações de Modificação -->
+                        <td>
+                          <div class="client-actions-grid">
+                            <div class="select-wrapper">
+                              <select class="admin-plan-select" 
+                                      [value]="client.plan || 'none'" 
+                                      (change)="mudarPlanoCliente(client.uid, $any($event.target).value)">
+                                <option value="none">Nenhum (Comum)</option>
+                                <option value="silver">Silver (R$ 60)</option>
+                                <option value="gold">Gold (R$ 90)</option>
+                                <option value="vip">VIP (Grátis)</option>
+                              </select>
+                            </div>
+                            
+                            @if (client.plan === 'silver') {
+                              <div class="cuts-adjustment-box">
+                                <input type="number" #cutsInput class="cuts-adjust-input" 
+                                       [value]="client.planHaircutsLeft ?? 0" min="0" max="100">
+                                <button type="button" class="btn-adjust-cuts" 
+                                        (click)="ajustarCortesSilver(client.uid, cutsInput.value)">
+                                  Ajustar
+                                </button>
+                              </div>
+                            }
+                          </div>
+                        </td>
+                      </tr>
+                    }
+                  </tbody>
+                </table>
+              </div>
+            }
+          </div>
+        </section>
+      }
+
+      <!-- ── ABA C: MEU EXPEDIENTE SEMANAL ── -->
+      @if (activeAdminTab() === 'expediente') {
+        @if (activeConfig(); as config) {
+          <section class="db-content" style="margin-top: 2.5rem;" aria-labelledby="schedule-heading">
+            <div class="db-content__header">
+              <h2 id="schedule-heading" class="db-content__title">
+                <i class="fa-solid fa-clock text-accent" aria-hidden="true"></i>
+                Configurar meu Expediente Semanal
+              </h2>
+            </div>
+
+            <div class="schedule-editor-card">
+              <p class="schedule-editor-desc">
+                Marque os dias da semana em que você realiza atendimentos e defina o horário de início e fim de funcionamento.
+                As mudanças salvam imediatamente e atualizam a agenda de agendamentos dos clientes em tempo real.
+              </p>
+
+              @if (configSuccess()) {
+                <div class="alert alert--success" style="margin-bottom: 2rem; border-radius: 8px;">
+                  <i class="fa-solid fa-circle-check" aria-hidden="true"></i>
+                  <span>{{ configSuccess() }}</span>
+                </div>
+              }
+
+              <div class="schedule-editor-grid">
+                @for (dayIndex of [1, 2, 3, 4, 5, 6, 0]; track dayIndex) {
+                  @if (config.dias[dayIndex]; as dia) {
+                    <div class="schedule-day-card" [class.schedule-day-card--inactive]="!dia.ativo">
+                      <div class="schedule-day-row" [class.schedule-day-row--inactive]="!dia.ativo">
+                        <label class="schedule-day-label">
+                          <input type="checkbox" [(ngModel)]="dia.ativo" [disabled]="isSavingConfig()" class="day-checkbox" />
+                          <span class="day-status-indicator"></span>
+                          <span class="day-name">{{ dia.diaNome }}</span>
+                        </label>
+
+                        <div class="schedule-day-hours" [style.opacity]="dia.ativo ? 1 : 0.4">
+                          <div class="hour-input-group">
+                            <span class="input-prefix">Início</span>
+                            <input type="time" [(ngModel)]="dia.inicio" [disabled]="!dia.ativo || isSavingConfig()" class="hour-input" step="1800" />
+                          </div>
+                          <div class="hour-input-group">
+                            <span class="input-prefix">Fim</span>
+                            <input type="time" [(ngModel)]="dia.fim" [disabled]="!dia.ativo || isSavingConfig()" class="hour-input" step="1800" />
+                          </div>
+                        </div>
+
+                        @if (!dia.ativo) {
+                          <span class="schedule-day-status-tag">Folga</span>
+                        } @else {
+                          <span class="schedule-day-status-tag schedule-day-status-tag--active">Ativo</span>
+                        }
+                      </div>
+
+                      <!-- Área de Intervalos Bloqueados -->
+                      @if (dia.ativo) {
+                        <div class="schedule-day-blocks">
+                          <div class="blocks-header">
+                            <span class="blocks-title">
+                              <i class="fa-solid fa-ban text-accent" aria-hidden="true"></i>
+                              Intervalos de Bloqueio (ex: Almoço, Intervalos)
+                            </span>
+                            <button type="button" class="btn-add-block" (click)="adicionarBloqueio(dia)" [disabled]="isSavingConfig()">
+                              <i class="fa-solid fa-plus" aria-hidden="true"></i> Adicionar Bloqueio
+                            </button>
+                          </div>
+
+                          @if (dia.bloqueios && dia.bloqueios.length > 0) {
+                            <div class="blocks-list">
+                              @for (bloq of dia.bloqueios; track $index) {
+                                <div class="block-item">
+                                  <div class="block-time-group">
+                                    <span class="block-prefix">Bloquear de</span>
+                                    <input type="time" [(ngModel)]="bloq.inicio" [disabled]="isSavingConfig()" class="hour-input" step="1800" />
+                                  </div>
+                                  <div class="block-time-group">
+                                    <span class="block-prefix">até</span>
+                                    <input type="time" [(ngModel)]="bloq.fim" [disabled]="isSavingConfig()" class="hour-input" step="1800" />
+                                  </div>
+                                  <button type="button" class="btn-remove-block" (click)="removerBloqueio(dia, $index)" [disabled]="isSavingConfig()" title="Remover Bloqueio">
+                                    <i class="fa-solid fa-trash-can" aria-hidden="true"></i>
+                                  </button>
+                                </div>
+                              }
+                            </div>
+                          } @else {
+                            <p class="no-blocks-msg">Nenhum horário de bloqueio definido para este dia.</p>
+                          }
+                        </div>
+                      }
+                    </div>
+                  }
+                }
+              </div>
+
+
+              <div class="schedule-editor-actions">
+                <button type="button" class="btn-accent save-schedule-btn" [disabled]="isSavingConfig()" (click)="salvarExpediente()">
+                  @if (isSavingConfig()) {
+                    <span class="loader"></span>
+                    Salvando Expediente...
+                  } @else {
+                    <i class="fa-solid fa-floppy-disk" aria-hidden="true"></i>
+                    Salvar Configuração de Horários
+                  }
+                </button>
+              </div>
+            </div>
+          </section>
+        }
+      }
+
+    </div>
+  }
+
+  <!-- ── 3. MODAL DE AGENDAMENTO ESPECIAL SEM CADASTRO ────────────────── -->
+  @if (showSpecialBookingModal()) {
+    <div class="modal-overlay" (click)="showSpecialBookingModal.set(false)" role="dialog" aria-modal="true">
+      <div class="modal-card" (click)="$event.stopPropagation()">
+        <button type="button" class="modal-close" (click)="showSpecialBookingModal.set(false)" aria-label="Fechar modal">
+          <i class="fa-solid fa-xmark" aria-hidden="true"></i>
+        </button>
+
+        <div class="modal-header">
+          <div class="modal-card-icon" style="background-color: rgba(250, 204, 21, 0.1); border: 1px solid var(--color-accent); color: var(--color-accent); width: 48px; height: 48px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; margin-bottom: 0.5rem; box-shadow: 0 4px 12px rgba(250, 204, 21, 0.15);">
+            <i class="fa-solid fa-calendar-plus"></i>
+          </div>
+          <h3 class="modal-title">Novo Agendamento Especial</h3>
+          <p class="modal-subtitle">Agende horários rapidamente para clientes que não possuem cadastro.</p>
+        </div>
+
+        <div class="modal-body">
+          <div class="special-booking-form">
+            
+            <!-- Nome do Cliente -->
+            <div class="form-group" style="margin-bottom: 1.25rem;">
+              <label for="specialBookingNome" class="form-label">Nome do Cliente</label>
+              <div class="input-wrapper">
+                <i class="fa-solid fa-user input-icon" aria-hidden="true"></i>
+                <input
+                  id="specialBookingNome"
+                  type="text"
+                  class="form-input form-input--icon"
+                  [value]="specialBookingNome()"
+                  (input)="specialBookingNome.set($any($event.target).value)"
+                  placeholder="Ex: Sr. Geraldo"
+                >
+              </div>
+            </div>
+
+            <!-- Categoria Especial -->
+            <div class="form-group" style="margin-bottom: 1.25rem;">
+              <span class="form-label" style="display: block; margin-bottom: 0.5rem;">Categoria Especial</span>
+              <div class="special-categories-picker" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.75rem;">
+                <label class="category-picker-card" [class.category-picker-card--active]="specialBookingCategoria() === 'idoso'">
+                  <input type="radio" name="specialCategory" value="idoso" [checked]="specialBookingCategoria() === 'idoso'" (change)="specialBookingCategoria.set('idoso')" style="position: absolute; opacity: 0;">
+                  <i class="fa-solid fa-person-cane text-accent" aria-hidden="true"></i>
+                  <span>Idoso(a)</span>
+                </label>
+                <label class="category-picker-card" [class.category-picker-card--active]="specialBookingCategoria() === 'pcd'">
+                  <input type="radio" name="specialCategory" value="pcd" [checked]="specialBookingCategoria() === 'pcd'" (change)="specialBookingCategoria.set('pcd')" style="position: absolute; opacity: 0;">
+                  <i class="fa-solid fa-wheelchair text-primary" aria-hidden="true"></i>
+                  <span>PCD</span>
+                </label>
+                <label class="category-picker-card" [class.category-picker-card--active]="specialBookingCategoria() === 'vip'">
+                  <input type="radio" name="specialCategory" value="vip" [checked]="specialBookingCategoria() === 'vip'" (change)="specialBookingCategoria.set('vip')" style="position: absolute; opacity: 0;">
+                  <i class="fa-solid fa-crown" style="color: #facc15;" aria-hidden="true"></i>
+                  <span>VIP / Importante</span>
+                </label>
+                <label class="category-picker-card" [class.category-picker-card--active]="specialBookingCategoria() === 'outro'">
+                  <input type="radio" name="specialCategory" value="outro" [checked]="specialBookingCategoria() === 'outro'" (change)="specialBookingCategoria.set('outro')" style="position: absolute; opacity: 0;">
+                  <i class="fa-solid fa-star" style="color: #94a3b8;" aria-hidden="true"></i>
+                  <span>Outro / Especial</span>
+                </label>
+              </div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr 120px; gap: 1rem; margin-bottom: 1.25rem;">
+              <!-- Barbeiro -->
+              <div class="form-group">
+                <label for="specialBookingBarbeiro" class="form-label">Barbeiro</label>
+                <div class="select-wrapper">
+                  <select
+                    id="specialBookingBarbeiro"
+                    class="form-input"
+                    [value]="specialBookingBarbeiroId()"
+                    (change)="specialBookingBarbeiroId.set($any($event.target).value)"
+                  >
+                    <option value="coser">Davi Coser</option>
+                    <option value="filippi">Filippi</option>
+                  </select>
+                </div>
+              </div>
+
+              <!-- Serviço -->
+              <div class="form-group">
+                <label for="specialBookingServico" class="form-label">Serviço</label>
+                <div class="select-wrapper">
+                  <select
+                    id="specialBookingServico"
+                    class="form-input"
+                    [value]="specialBookingServicoId()"
+                    (change)="onServicoChange($any($event.target).value)"
+                  >
+                    <option value="1">Corte (R$ 35)</option>
+                    <option value="2">Barba (R$ 30)</option>
+                    <option value="3">Corte + Barba (R$ 60)</option>
+                  </select>
+                </div>
+              </div>
+
+              <!-- Preço Ajustável -->
+              <div class="form-group">
+                <label for="specialBookingPreco" class="form-label">Preço (R$)</label>
+                <div class="input-wrapper">
+                  <input
+                    id="specialBookingPreco"
+                    type="number"
+                    min="0"
+                    class="form-input"
+                    [value]="specialBookingPreco()"
+                    (input)="specialBookingPreco.set($any($event.target).valueAsNumber)"
+                    placeholder="35"
+                    style="padding-right: 0.5rem; font-weight: 600;"
+                  >
+                </div>
+              </div>
+            </div>
+
+            <!-- Data do Agendamento -->
+            <div class="form-group" style="margin-bottom: 1.25rem;">
+              <label for="specialBookingData" class="form-label">Data do Atendimento</label>
+              <div class="input-wrapper">
+                <i class="fa-solid fa-calendar-day input-icon" aria-hidden="true"></i>
+                <input
+                  id="specialBookingData"
+                  type="date"
+                  class="form-input form-input--icon"
+                  [value]="specialBookingData()"
+                  (input)="specialBookingData.set($any($event.target).value); specialBookingHorario.set('')"
+                >
+              </div>
+            </div>
+
+            <!-- Grade de Horários Livres -->
+            <div class="form-group" style="margin-bottom: 1.5rem;">
+              <span class="form-label" style="display: block; margin-bottom: 0.5rem;">Escolha um Horário Disponível</span>
+              @if (availableSlotsForSpecialBooking().length === 0) {
+                <div class="alert alert--error" style="font-size: 0.8rem; padding: 0.75rem 1rem;">
+                  <i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i>
+                  <span>Não há horários livres neste dia para o barbeiro e serviço escolhidos.</span>
+                </div>
+              } @else {
+                <div class="chip-group" style="grid-template-columns: repeat(4, 1fr); gap: 0.5rem;">
+                  @for (slot of availableSlotsForSpecialBooking(); track slot) {
+                    <label class="chip" [class.chip--selected]="specialBookingHorario() === slot" style="padding: 0.4rem; font-size: 0.8rem; border-radius: var(--radius-sm);">
+                      <input
+                        type="radio"
+                        name="specialBookingSlot"
+                        [value]="slot"
+                        [checked]="specialBookingHorario() === slot"
+                        (change)="specialBookingHorario.set(slot)"
+                      >
+                      {{ slot }}
+                    </label>
+                  }
+                </div>
+              }
+            </div>
+
+          </div>
+        </div>
+
+        <div class="modal-actions" style="display: flex; gap: 1rem; justify-content: flex-end; padding-top: 1rem; border-top: 1px solid var(--color-border);">
+          <button type="button" class="btn-outline" style="padding: 0.6rem 1.5rem; font-size: 0.9rem;" (click)="showSpecialBookingModal.set(false)">
+            Cancelar
+          </button>
+          <button type="button" class="btn-accent" style="padding: 0.6rem 1.5rem; font-size: 0.9rem;" [disabled]="!specialBookingNome() || !specialBookingData() || !specialBookingHorario() || salvandoEspecial()" (click)="salvarAgendamentoEspecial()">
+            @if (salvandoEspecial()) {
+              <i class="fa-solid fa-spinner fa-spin" aria-hidden="true"></i>
+              Processando...
+            } @else {
+              <i class="fa-solid fa-check" aria-hidden="true"></i>
+              Confirmar Horário
+            }
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+
+</div>

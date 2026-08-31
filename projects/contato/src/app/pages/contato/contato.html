@@ -1,0 +1,143 @@
+<div class="contato-page">
+
+  <!-- ── Cabeçalho ─────────────────────────────────────── -->
+  <div class="contato-header">
+    <div class="container">
+      <h1 class="section-title">
+        Fale <span>Conosco</span>
+      </h1>
+      <span class="accent-divider" aria-hidden="true"></span>
+      <p class="section-subtitle">
+        Tire dúvidas ou envie uma mensagem direto pelo WhatsApp.
+        Respondemos rapidinho!
+      </p>
+    </div>
+  </div>
+
+  <!-- ── Corpo ─────────────────────────────────────────── -->
+  <div class="container contato-body">
+
+    <div class="contato-grid">
+
+      <!-- Formulário -->
+      <section class="contato-form-wrap" aria-labelledby="form-heading">
+        <h2 id="form-heading" class="contato-form-wrap__title">
+          <i class="fa-brands fa-whatsapp" aria-hidden="true"></i>
+          Enviar pelo WhatsApp
+        </h2>
+        <p class="contato-form-wrap__desc">
+          Preencha os campos abaixo. Ao clicar em "Enviar", você será
+          redirecionado para o WhatsApp da barbearia com a mensagem já pronta.
+        </p>
+
+        <form
+          class="contato-form"
+          [formGroup]="form"
+          (ngSubmit)="enviarWhatsApp()"
+          novalidate
+          aria-label="Formulário de contato via WhatsApp"
+        >
+          <!-- Nome -->
+          <div class="form-group">
+            <label for="nome" class="form-label">Seu nome</label>
+            <input
+              id="nome"
+              type="text"
+              class="form-input"
+              formControlName="nome"
+              placeholder="Ex: Maria Souza"
+              autocomplete="given-name"
+            >
+            @if (form.controls.nome.invalid && form.controls.nome.touched) {
+              <span class="form-error" role="alert">
+                @if (form.controls.nome.errors?.['required']) {
+                  Informe seu nome.
+                } @else {
+                  O nome deve ter ao menos 2 caracteres.
+                }
+              </span>
+            }
+          </div>
+
+          <!-- Mensagem -->
+          <div class="form-group">
+            <label for="mensagem" class="form-label">Sua mensagem</label>
+            <textarea
+              id="mensagem"
+              class="form-input"
+              formControlName="mensagem"
+              rows="6"
+              placeholder="Ex: Olá! Gostaria de saber mais sobre o serviço de coloração..."
+            ></textarea>
+            @if (form.controls.mensagem.invalid && form.controls.mensagem.touched) {
+              <span class="form-error" role="alert">
+                @if (form.controls.mensagem.errors?.['required']) {
+                  Escreva sua mensagem.
+                } @else {
+                  A mensagem deve ter ao menos 10 caracteres.
+                }
+              </span>
+            }
+          </div>
+
+          <button type="submit" class="btn-whatsapp contato-form__submit">
+            <i class="fa-brands fa-whatsapp" aria-hidden="true"></i>
+            Enviar pelo WhatsApp
+          </button>
+        </form>
+      </section>
+
+      <!-- Info lateral -->
+      <aside class="contato-info" aria-label="Informações de contato">
+
+        <div class="contato-info__card">
+          <h3 class="contato-info__section-title">Horário de Atendimento</h3>
+          <ul class="contato-info__list" role="list">
+            <li>
+              <span class="contato-info__day">Segunda a Sexta</span>
+              <span class="contato-info__time">08:00 – 22:00</span>
+            </li>
+            <li>
+              <span class="contato-info__day">Sábado</span>
+              <span class="contato-info__time">07:00 – 16:00</span>
+            </li>
+            <li>
+              <span class="contato-info__day">Domingo</span>
+              <span class="contato-info__time">Fechado</span>
+            </li>
+          </ul>
+        </div>
+
+        <div class="contato-info__card">
+          <h3 class="contato-info__section-title">Redes Sociais</h3>
+          <a
+            [href]="instagramUrl"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="contato-info__social"
+            aria-label="Siga a Coser Barber no Instagram (abre em nova aba)"
+          >
+            <span class="contato-info__social-icon contato-info__social-icon--instagram">
+              <i class="fa-brands fa-instagram" aria-hidden="true"></i>
+            </span>
+            <span>
+              <strong>&#64;coserbarber</strong>
+              <small>Siga no Instagram</small>
+            </span>
+          </a>
+        </div>
+
+        <div class="contato-info__card contato-info__card--highlight">
+          <i class="fa-solid fa-scissors contato-info__highlight-icon" aria-hidden="true"></i>
+          <p class="contato-info__highlight-text">
+            Prefere já marcar seu horário?
+          </p>
+          <a routerLink="/agenda" class="btn-primary contato-info__cta-btn">
+            Agendar agora
+          </a>
+        </div>
+
+      </aside>
+    </div>
+  </div>
+</div>

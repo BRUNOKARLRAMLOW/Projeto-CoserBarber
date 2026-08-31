@@ -1,0 +1,2151 @@
+// ============================================================
+// PAINEL DO BARBEIRO (ADMIN) — Estilos
+// ============================================================
+
+.admin-page {
+  min-height: calc(100dvh - 70px);
+  padding: 3rem 0 5rem;
+  background-color: var(--color-bg);
+  display: flex;
+  flex-direction: column;
+}
+
+// ── 0. TELA DE CARREGAMENTO / LOADING STATE ──────────────────
+.admin-loading-container {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  background-color: var(--color-bg);
+}
+
+.admin-loader-card {
+  width: 100%;
+  max-width: 400px;
+  background: rgba(10, 20, 38, 0.45);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: var(--radius-md);
+  padding: 3.5rem 2rem;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 1.5rem;
+}
+
+/* Spinner animado com tema premium */
+.spinner-orbit {
+  position: relative;
+  width: 80px;
+  height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 0.5rem;
+}
+
+.spinner-circle {
+  position: absolute;
+  border-radius: 50%;
+  border: 3px solid transparent;
+  
+  &--outer {
+    width: 100%;
+    height: 100%;
+    border-top-color: var(--color-accent);
+    border-bottom-color: rgba(250, 204, 21, 0.2);
+    animation: spin 1.5s cubic-bezier(0.5, 0, 0.5, 1) infinite;
+  }
+  
+  &--inner {
+    width: 70%;
+    height: 70%;
+    border-left-color: #3b82f6; // Um azul premium
+    border-right-color: rgba(59, 130, 246, 0.2);
+    animation: spin-reverse 1s cubic-bezier(0.5, 0, 0.5, 1) infinite;
+  }
+}
+
+.spinner-icon {
+  font-size: 1.5rem;
+  color: var(--color-accent);
+  filter: drop-shadow(0 0 8px rgba(250, 204, 21, 0.6));
+  animation: pulse-scissors 2s infinite ease-in-out;
+}
+
+.admin-loader-title {
+  font-family: var(--font-display);
+  font-size: 1.4rem;
+  font-weight: 600;
+  color: var(--color-text);
+  margin: 0;
+  letter-spacing: 0.5px;
+}
+
+.admin-loader-subtitle {
+  font-size: 0.875rem;
+  color: var(--color-text-secondary);
+  margin: 0;
+  line-height: 1.4;
+}
+
+// Animações do Carregador
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+@keyframes spin-reverse {
+  0% { transform: rotate(360deg); }
+  100% { transform: rotate(0deg); }
+}
+
+@keyframes pulse-scissors {
+  0%, 100% {
+    transform: scale(1) rotate(0deg);
+  }
+  50% {
+    transform: scale(1.15) rotate(15deg);
+  }
+}
+
+// ── 1. TELA DE LOGIN ─────────────────────────────────────────
+.login-container {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+}
+
+.login-card {
+  width: 100%;
+  max-width: 440px;
+  background: rgba(10, 20, 38, 0.65);
+  backdrop-filter: blur(16px);
+  border: 1px solid rgba(29, 50, 85, 0.5);
+  border-radius: var(--radius-md);
+  padding: 3rem 2.5rem;
+  box-shadow: var(--shadow-lg);
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+
+  @media (max-width: 480px) {
+    padding: 2rem 1.5rem;
+  }
+
+  &__header {
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  &__icon {
+    width: 60px;
+    height: 60px;
+    background-color: rgba(250, 204, 21, 0.1);
+    border: 1.5px solid var(--color-accent);
+    color: var(--color-accent);
+    font-size: 1.5rem;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 0.5rem;
+    box-shadow: 0 4px 20px rgba(250, 204, 21, 0.2);
+  }
+
+  &__title {
+    font-family: var(--font-display);
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: var(--color-text);
+  }
+
+  &__subtitle {
+    font-size: 0.875rem;
+    color: var(--color-text-secondary);
+    line-height: 1.5;
+  }
+}
+
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.login-submit {
+  width: 100%;
+  padding: 0.875rem;
+  font-size: 1rem;
+  margin-top: 0.5rem;
+}
+
+.login-note {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  font-size: 0.8rem;
+  color: var(--color-text-secondary);
+  padding: 0.75rem 1rem;
+  background-color: rgba(255, 255, 255, 0.02);
+  border-radius: var(--radius-sm);
+  border-left: 3px solid var(--color-accent);
+
+  strong {
+    color: var(--color-text);
+  }
+}
+
+// Invólucro do Input com Ícone
+.input-wrapper {
+  position: relative;
+  width: 100%;
+
+  .input-icon {
+    position: absolute;
+    left: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--color-text-secondary);
+    font-size: 0.9rem;
+    pointer-events: none;
+  }
+}
+
+.form-input--icon {
+  padding-left: 2.5rem !important;
+}
+
+// ── 2. DASHBOARD ADMINISTRATIVO ──────────────────────────────
+.dashboard {
+  display: flex;
+  flex-direction: column;
+  gap: 2.5rem;
+}
+
+// Cabeçalho do Dashboard
+.db-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem;
+  border-bottom: 1px solid var(--color-border);
+  padding-bottom: 1.5rem;
+
+  @media (max-width: 560px) {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+
+  &__title {
+    font-family: var(--font-display);
+    font-size: 2.2rem;
+    font-weight: 700;
+    color: var(--color-text);
+    line-height: 1.2;
+  }
+
+  &__subtitle {
+    font-size: 0.95rem;
+    color: var(--color-text-secondary);
+    margin-top: 0.25rem;
+  }
+
+  &__logout {
+    padding: 0.5rem 1.25rem;
+    font-size: 0.875rem;
+
+    @media (max-width: 560px) {
+      width: 100%;
+    }
+  }
+}
+
+// Grade de Estatísticas
+.db-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.5rem;
+
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+}
+
+.stat-card {
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  box-shadow: var(--shadow-md);
+
+  &__icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.25rem;
+    flex-shrink: 0;
+
+    &--blue {
+      background-color: rgba(37, 99, 235, 0.1);
+      color: #3b82f6;
+    }
+    &--gold {
+      background-color: rgba(250, 204, 21, 0.1);
+      color: var(--color-accent);
+    }
+    &--green {
+      background-color: rgba(74, 222, 128, 0.1);
+      color: #4ade80;
+    }
+  }
+
+  &__info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+
+  &__label {
+    font-size: 0.78rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--color-text-secondary);
+  }
+
+  &__value {
+    font-family: var(--font-display);
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--color-text);
+  }
+}
+
+// Seção de Conteúdo da Tabela
+.db-content {
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: 2rem;
+  box-shadow: var(--shadow-md);
+
+  @media (max-width: 480px) {
+    padding: 1.25rem;
+  }
+
+  &__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+
+    @media (max-width: 640px) {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 1rem;
+    }
+  }
+
+  &__title {
+    font-family: var(--font-display);
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: var(--color-text);
+    display: flex;
+    align-items: center;
+    gap: 0.625rem;
+  }
+}
+
+// Filtro de Data
+.db-filter {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 240px;
+
+  @media (max-width: 640px) {
+    width: 100%;
+  }
+
+  &__icon {
+    position: absolute;
+    left: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--color-text-secondary);
+    font-size: 0.8rem;
+    pointer-events: none;
+  }
+
+  &__input {
+    padding-left: 2.25rem !important;
+    padding-right: 2.25rem !important;
+    font-size: 0.85rem !important;
+    height: 38px;
+    background-color: var(--color-bg) !important;
+  }
+
+  &__clear {
+    position: absolute;
+    right: 0.75rem;
+    top: 50%;
+    transform: translateY(-50%);
+    background: transparent;
+    border: none;
+    color: var(--color-text-secondary);
+    cursor: pointer;
+    padding: 0.25rem;
+    font-size: 0.9rem;
+    transition: color var(--transition);
+
+    &:hover {
+      color: var(--color-text);
+    }
+  }
+}
+
+// Estilização da Tabela
+.db-table-wrapper {
+  width: 100%;
+  overflow-x: auto;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--color-border);
+}
+
+.db-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  font-size: 0.9rem;
+
+  th {
+    background-color: rgba(255, 255, 255, 0.02);
+    border-bottom: 2px solid var(--color-border);
+    color: var(--color-text-secondary);
+    font-weight: 600;
+    padding: 1rem 1.25rem;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+
+  td {
+    padding: 1.1rem 1.25rem;
+    border-bottom: 1px solid var(--color-border);
+    color: var(--color-text);
+    vertical-align: middle;
+  }
+}
+
+.db-row {
+  transition: background-color var(--transition);
+
+  &:hover {
+    background-color: rgba(255, 255, 255, 0.015);
+  }
+
+  &:last-child td {
+    border-bottom: none;
+  }
+
+  &__badge-date {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background-color: rgba(255, 255, 255, 0.04);
+    border: 1px solid var(--color-border);
+    padding: 0.35rem 0.75rem;
+    border-radius: var(--radius-lg);
+    font-size: 0.82rem;
+    color: var(--color-text-secondary);
+    font-weight: 500;
+    white-space: nowrap;
+
+    i {
+      color: var(--color-accent);
+    }
+  }
+
+  &__time {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    font-size: 0.95rem;
+    color: var(--color-text);
+    font-family: var(--font-body);
+
+    i {
+      font-size: 0.875rem;
+    }
+  }
+
+  &__client {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: 600;
+
+    i {
+      font-size: 0.82rem;
+    }
+  }
+
+  &__service {
+    font-weight: 500;
+    color: var(--color-text-secondary);
+  }
+}
+
+// Botão de Excluir Agendamento
+.btn-delete {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.375rem;
+  padding: 0.45rem 0.875rem;
+  background-color: rgba(248, 113, 113, 0.04);
+  border: 1.2px solid rgba(248, 113, 113, 0.25);
+  border-radius: var(--radius-sm);
+  color: #f87171;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition);
+  margin: 0 auto;
+
+  &:hover, &:focus-visible {
+    background-color: #f87171;
+    border-color: #f87171;
+    color: #fff;
+    box-shadow: 0 4px 12px rgba(248, 113, 113, 0.2);
+  }
+
+  &:focus-visible {
+    outline: 2px solid #f87171;
+    outline-offset: 2px;
+  }
+}
+
+// Estado Vazio (Empty State)
+.db-empty-state {
+  padding: 4rem 2rem;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+
+  &__icon {
+    font-size: 3rem;
+    color: var(--color-border);
+    margin-bottom: 0.5rem;
+  }
+
+  &__title {
+    font-family: var(--font-display);
+    font-size: 1.25rem;
+    color: var(--color-text);
+    font-weight: 700;
+  }
+
+  &__text {
+    font-size: 0.875rem;
+    color: var(--color-text-secondary);
+    max-width: 320px;
+    line-height: 1.6;
+  }
+}
+
+// Filtros de Barbeiro (Tabs)
+.db-tabs {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+  border-bottom: 1px solid var(--color-border);
+  padding-bottom: 0.75rem;
+
+  &__btn {
+    background: transparent;
+    border: none;
+    color: var(--color-text-secondary);
+    padding: 0.5rem 1.25rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+    cursor: pointer;
+    border-radius: var(--radius-sm);
+    transition: all var(--transition);
+
+    &:hover {
+      color: var(--color-text);
+      background-color: rgba(255, 255, 255, 0.03);
+    }
+
+    &--active {
+      color: var(--color-accent);
+      background-color: rgba(250, 204, 21, 0.08);
+      border: 1px solid rgba(250, 204, 21, 0.2);
+    }
+  }
+}
+
+// Badge de Barbeiro na tabela
+.db-row__barber-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.25rem 0.625rem;
+  border-radius: var(--radius-sm);
+  font-size: 0.78rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+
+  i {
+    font-size: 0.82rem;
+  }
+
+  &--coser {
+    background-color: rgba(59, 130, 246, 0.08);
+    border: 1px solid rgba(59, 130, 246, 0.2);
+    color: #60a5fa;
+  }
+
+  &--filippi {
+    background-color: rgba(236, 72, 153, 0.08);
+    border: 1px solid rgba(236, 72, 153, 0.2);
+    color: #f472b6;
+  }
+}
+
+// ── 3. GRADE DO CRONOGRAMA & MINI-CALENDÁRIO ───────────────────
+.db-schedule-grid {
+  display: grid;
+  grid-template-columns: 290px 1fr;
+  gap: 2rem;
+  align-items: start;
+  margin-top: 1rem;
+
+  @media (max-width: 992px) {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+}
+
+// Mini Calendário Administrativo
+.mini-calendar {
+  background-color: var(--color-surface-alt);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: 1.25rem;
+  box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.03);
+  backdrop-filter: blur(10px);
+}
+
+.mcal-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.25rem;
+
+  &__btn {
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid var(--color-border);
+    color: var(--color-text-secondary);
+    width: 32px;
+    height: 32px;
+    border-radius: var(--radius-sm);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all var(--transition);
+
+    &:hover {
+      background-color: var(--color-accent-light);
+      border-color: var(--color-accent);
+      color: var(--color-accent);
+    }
+  }
+
+  &__label {
+    font-size: 0.95rem;
+    font-weight: 700;
+    text-transform: capitalize;
+    color: var(--color-text);
+  }
+}
+
+.mcal-weekdays {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  text-align: center;
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  text-transform: uppercase;
+  margin-bottom: 0.75rem;
+  letter-spacing: 0.05em;
+
+  .sat, .sun {
+    color: #f87171;
+  }
+}
+
+.mcal-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 5px;
+}
+
+.mcal-cell {
+  aspect-ratio: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-sm);
+  font-size: 0.85rem;
+  font-weight: 500;
+  transition: all var(--transition);
+
+  &--empty {
+    pointer-events: none;
+    background: transparent;
+  }
+
+  &--day {
+    position: relative;
+    background: rgba(255, 255, 255, 0.01);
+    border: 1px solid transparent;
+    color: var(--color-text);
+    cursor: pointer;
+
+    &:hover:not(.mcal-cell--closed) {
+      background-color: rgba(255, 255, 255, 0.05);
+      border-color: rgba(255, 255, 255, 0.1);
+    }
+
+    &.mcal-cell--selected {
+      background-color: var(--color-accent-light) !important;
+      border-color: var(--color-accent) !important;
+      color: var(--color-accent) !important;
+      font-weight: 700;
+      box-shadow: 0 0 10px rgba(250, 204, 21, 0.15);
+    }
+
+    &.mcal-cell--today {
+      border-color: var(--color-primary);
+      color: var(--color-text);
+      font-weight: 700;
+
+      &::after {
+        content: '';
+        position: absolute;
+        top: 4px;
+        right: 4px;
+        width: 4px;
+        height: 4px;
+        border-radius: 50%;
+        background-color: var(--color-primary);
+      }
+    }
+
+    &.mcal-cell--closed {
+      color: rgba(255, 255, 255, 0.15);
+      background-color: rgba(0, 0, 0, 0.15);
+      cursor: pointer;
+      
+      &:hover {
+        background-color: rgba(255, 255, 255, 0.02);
+      }
+    }
+  }
+
+  &__num {
+    z-index: 1;
+  }
+
+  &__dot {
+    position: absolute;
+    bottom: 4px;
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background-color: var(--color-accent);
+    box-shadow: 0 0 4px var(--color-accent);
+  }
+}
+
+// Seção de Linha do Tempo (Timeline)
+.timeline-header {
+  border-bottom: 1px solid var(--color-border);
+  padding-bottom: 0.875rem;
+  margin-bottom: 1.5rem;
+
+  &__title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--color-text);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+
+    i {
+      font-size: 0.95rem;
+    }
+  }
+}
+
+.timeline-wrapper {
+  display: flex;
+  gap: 1.5rem;
+  align-items: flex-start;
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+    gap: 1.5rem;
+    align-items: stretch;
+  }
+}
+
+.timeline-barber-col {
+  flex: 1;
+  min-width: 0;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+
+  &__title {
+    font-family: var(--font-display);
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--color-text);
+    display: flex;
+    align-items: center;
+    gap: 0.625rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    padding-bottom: 0.75rem;
+    margin-bottom: 0.25rem;
+
+    @media (max-width: 576px) {
+      justify-content: center;
+    }
+  }
+
+  &__badge {
+    width: 28px;
+    height: 28px;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.75rem;
+    font-weight: 700;
+    font-family: var(--font-body);
+
+    &--coser {
+      background-color: rgba(59, 130, 246, 0.15);
+      border: 1px solid rgba(59, 130, 246, 0.3);
+      color: #60a5fa;
+    }
+
+    &--filippi {
+      background-color: rgba(236, 72, 153, 0.15);
+      border: 1px solid rgba(236, 72, 153, 0.3);
+      color: #f472b6;
+    }
+  }
+}
+
+.timeline-slots-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.625rem;
+  width: 100%;
+}
+
+// Slots individuais da agenda
+.timeline-slot {
+  display: flex;
+  flex-direction: column;
+  border-radius: var(--radius-sm);
+  padding: 0.75rem 1rem;
+  transition: all var(--transition);
+  position: relative;
+  overflow: hidden;
+  width: 100%;
+
+  &--free {
+    background-color: rgba(74, 222, 128, 0.02);
+    border: 1px dashed rgba(74, 222, 128, 0.2);
+    display: flex;
+    flex-direction: row !important;
+    align-items: center;
+    justify-content: space-between;
+
+    @media (max-width: 576px) {
+      justify-content: center;
+      gap: 1rem;
+    }
+
+    .timeline-slot__time {
+      font-weight: 600;
+      color: var(--color-text);
+    }
+
+    .timeline-slot__status {
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: #4ade80;
+      background-color: rgba(74, 222, 128, 0.08);
+      padding: 0.15rem 0.5rem;
+      border-radius: var(--radius-sm);
+      border: 1px solid rgba(74, 222, 128, 0.15);
+    }
+  }
+
+  &--booked {
+    background-color: rgba(37, 99, 235, 0.04);
+    border: 1px solid rgba(37, 99, 235, 0.25);
+    cursor: pointer;
+
+    &:hover {
+      background-color: rgba(37, 99, 235, 0.08);
+      border-color: rgba(37, 99, 235, 0.4);
+    }
+
+    .timeline-slot__time {
+      color: #60a5fa;
+    }
+  }
+
+  &--continuation {
+    background-color: rgba(37, 99, 235, 0.015);
+    border: 1px dashed rgba(37, 99, 235, 0.18);
+    cursor: pointer;
+
+    &:hover {
+      background-color: rgba(37, 99, 235, 0.04);
+      border-color: rgba(37, 99, 235, 0.3);
+    }
+
+    .timeline-slot__time {
+      color: rgba(96, 165, 250, 0.6);
+    }
+  }
+
+  &__main {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+
+    @media (max-width: 576px) {
+      justify-content: center;
+      gap: 1rem;
+    }
+  }
+
+  &__time {
+    font-size: 0.9rem;
+    font-weight: 700;
+    font-family: var(--font-body);
+  }
+
+  &__client {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--color-text);
+    display: flex;
+    align-items: center;
+    gap: 0.375rem;
+
+    i {
+      font-size: 0.72rem;
+      color: var(--color-text-secondary);
+    }
+
+    &--continuation {
+      color: var(--color-text-secondary);
+      font-style: italic;
+      font-weight: 500;
+    }
+  }
+
+  &__arrow {
+    font-size: 0.75rem;
+    color: var(--color-text-secondary);
+    transition: transform var(--transition);
+  }
+
+  &--expanded {
+    background-color: rgba(37, 99, 235, 0.08) !important;
+    border-color: rgba(37, 99, 235, 0.5) !important;
+
+    .timeline-slot__arrow {
+      transform: rotate(180deg);
+      color: var(--color-accent);
+    }
+  }
+}
+
+// Card de Detalhe Expandido Accordion
+.timeline-detail-card {
+  margin-top: 0.75rem;
+  padding: 0.875rem;
+  background-color: rgba(10, 20, 38, 0.75);
+  border: 1px solid rgba(29, 50, 85, 0.6);
+  border-radius: var(--radius-sm);
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  animation: slideDown 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: var(--shadow-md);
+
+  &__cancel {
+    width: 100%;
+    margin-top: 0.25rem;
+  }
+}
+
+.detail-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+
+  div {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.8rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+    padding: 0.375rem 0;
+    min-height: 32px;
+    box-sizing: border-box;
+
+    &:last-child {
+      border-bottom: none;
+      padding-bottom: 0;
+    }
+  }
+
+  dt {
+    color: var(--color-text-secondary);
+    font-weight: 500;
+    margin: 0;
+    padding: 0;
+  }
+
+  dd {
+    color: var(--color-text);
+    font-weight: 600;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 0.5rem;
+  }
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+// ── Weekly Schedule Editor Styles ─────────────────────────────
+.schedule-editor-card {
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: 2.25rem;
+  margin-top: 1.5rem;
+  box-shadow: var(--shadow-md);
+
+  @media (max-width: 576px) {
+    padding: 1.5rem 1rem;
+  }
+}
+
+.schedule-editor-desc {
+  font-size: 0.925rem;
+  color: var(--color-text-secondary);
+  line-height: 1.6;
+  margin-bottom: 2rem;
+  max-width: 680px;
+}
+
+.schedule-editor-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  margin-bottom: 2.5rem;
+}
+
+.schedule-day-card {
+  background-color: var(--color-surface-alt);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  transition: all var(--transition);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+
+  &:hover {
+    border-color: rgba(255, 255, 255, 0.08);
+  }
+
+  &--inactive {
+    border-color: rgba(29, 50, 85, 0.3);
+    background-color: rgba(0, 0, 0, 0.12);
+  }
+}
+
+.schedule-day-row {
+  display: grid;
+  grid-template-columns: 220px 1fr 100px;
+  align-items: center;
+  gap: 1.5rem;
+  padding: 1.15rem 1.5rem;
+  background: transparent;
+  border: none;
+  border-radius: 0;
+
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+    padding: 1.25rem 1rem;
+    justify-items: center;
+    text-align: center;
+  }
+}
+
+.schedule-day-label {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--color-text);
+  cursor: pointer;
+  user-select: none;
+  width: 100%;
+
+  @media (max-width: 768px) {
+    justify-content: center;
+  }
+
+  .day-checkbox {
+    width: 1.2rem;
+    height: 1.2rem;
+    accent-color: var(--color-accent);
+    cursor: pointer;
+  }
+
+  .day-status-indicator {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background-color: var(--color-error);
+    transition: background-color var(--transition);
+  }
+
+  .day-checkbox:checked ~ .day-status-indicator {
+    background-color: var(--color-success);
+    box-shadow: 0 0 6px var(--color-success);
+  }
+}
+
+.schedule-day-hours {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  transition: opacity var(--transition);
+  width: 100%;
+  justify-content: flex-start;
+
+  @media (max-width: 768px) {
+    justify-content: center;
+    gap: 1rem;
+  }
+
+  @media (max-width: 480px) {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}
+
+.hour-input-group {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+
+  .input-prefix {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--color-text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    min-width: 45px;
+  }
+
+  .hour-input {
+    padding: 0.5rem 0.875rem;
+    background-color: var(--color-bg);
+    border: 1.5px solid var(--color-border);
+    border-radius: 6px;
+    color: var(--color-text);
+    font-size: 0.9rem;
+    font-weight: 600;
+    font-family: var(--font-body);
+    transition: all var(--transition);
+    width: 110px;
+
+    @media (max-width: 480px) {
+      width: 100%;
+    }
+
+    &:focus {
+      outline: none;
+      border-color: var(--color-accent);
+      box-shadow: 0 0 0 3px var(--color-accent-light);
+    }
+  }
+}
+
+.schedule-day-status-tag {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.35rem 0.85rem;
+  border-radius: var(--radius-lg);
+  font-size: 0.78rem;
+  font-weight: 700;
+  background-color: rgba(248, 113, 113, 0.1);
+  border: 1px solid rgba(248, 113, 113, 0.25);
+  color: var(--color-error);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  justify-self: end;
+
+  @media (max-width: 768px) {
+    justify-self: center;
+  }
+
+  &--active {
+    background-color: rgba(74, 222, 128, 0.1);
+    border: 1px solid rgba(74, 222, 128, 0.25);
+    color: var(--color-success);
+  }
+}
+
+// Estilos adicionais para Intervalos de Bloqueio (Meu Expediente)
+.schedule-day-blocks {
+  border-top: 1px solid var(--color-border);
+  padding: 1.25rem 1.5rem;
+  background-color: rgba(255, 255, 255, 0.015);
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+
+  @media (max-width: 768px) {
+    padding: 1.25rem 1rem;
+  }
+}
+
+.blocks-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+
+  @media (max-width: 480px) {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
+.blocks-title {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--color-text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.btn-add-block {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.4rem 0.85rem;
+  background-color: rgba(250, 204, 21, 0.08);
+  border: 1px solid rgba(250, 204, 21, 0.25);
+  border-radius: 6px;
+  color: var(--color-accent);
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition);
+
+  &:hover:not(:disabled) {
+    background-color: var(--color-accent);
+    color: #000;
+    box-shadow: 0 0 10px rgba(250, 204, 21, 0.25);
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+.blocks-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.block-item {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  padding: 0.75rem 1rem;
+  background-color: rgba(0, 0, 0, 0.15);
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  width: fit-content;
+  animation: slideDown 0.25s ease-out;
+
+  @media (max-width: 576px) {
+    flex-direction: column;
+    align-items: stretch;
+    width: 100%;
+    gap: 0.75rem;
+  }
+}
+
+.block-time-group {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+
+  .block-prefix {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--color-text-secondary);
+  }
+}
+
+.btn-remove-block {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  background-color: rgba(248, 113, 113, 0.08);
+  border: 1px solid rgba(248, 113, 113, 0.25);
+  border-radius: 6px;
+  color: #f87171;
+  cursor: pointer;
+  transition: all var(--transition);
+
+  &:hover:not(:disabled) {
+    background-color: #f87171;
+    color: #fff;
+    box-shadow: 0 0 8px rgba(248, 113, 113, 0.3);
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+.no-blocks-msg {
+  font-size: 0.825rem;
+  color: rgba(255, 255, 255, 0.3);
+  margin: 0;
+  font-style: italic;
+}
+
+
+.schedule-editor-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 1.5rem;
+
+  @media (max-width: 768px) {
+    justify-content: center;
+  }
+}
+
+.save-schedule-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.875rem 2.5rem;
+  font-size: 0.95rem;
+  font-weight: 700;
+  width: auto;
+
+  @media (max-width: 768px) {
+    width: 100%;
+  }
+
+  .loader {
+    width: 1.15rem;
+    height: 1.15rem;
+    border: 2.5px solid rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    border-top-color: white;
+    animation: spin 0.8s linear infinite;
+  }
+}
+
+// ── Novo Layout de Abas Administrativas ────────────────────────
+.db-navigation-tabs {
+  display: flex;
+  gap: 0.75rem;
+  margin-top: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.db-nav-tab {
+  background-color: rgba(255, 255, 255, 0.02);
+  border: 1px solid var(--color-border);
+  color: var(--color-text-secondary);
+  padding: 0.625rem 1.25rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  border-radius: var(--radius-sm);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: all var(--transition);
+
+  i {
+    font-size: 0.9rem;
+  }
+
+  &:hover {
+    color: var(--color-text);
+    background-color: rgba(255, 255, 255, 0.05);
+    border-color: rgba(255, 255, 255, 0.15);
+  }
+
+  &--active {
+    color: var(--color-accent) !important;
+    background-color: rgba(250, 204, 21, 0.08) !important;
+    border-color: var(--color-accent) !important;
+    box-shadow: 0 0 12px rgba(250, 204, 21, 0.1);
+  }
+}
+
+// ── Gerenciador de Clientes e Assinaturas ───────────────────────
+.clients-desc {
+  font-size: 0.92rem;
+  color: var(--color-text-secondary);
+  line-height: 1.6;
+  margin-bottom: 2rem;
+}
+
+.clients-table-wrapper {
+  width: 100%;
+  overflow-x: auto;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--color-border);
+}
+
+.clients-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  font-size: 0.9rem;
+
+  th {
+    background-color: rgba(255, 255, 255, 0.02);
+    border-bottom: 2px solid var(--color-border);
+    color: var(--color-text-secondary);
+    font-weight: 600;
+    padding: 1.1rem 1.25rem;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+
+  td {
+    padding: 1.25rem;
+    border-bottom: 1px solid var(--color-border);
+    color: var(--color-text);
+    vertical-align: middle;
+  }
+
+  tr {
+    transition: background-color var(--transition);
+
+    &:hover {
+      background-color: rgba(255, 255, 255, 0.015);
+    }
+
+    &:last-child td {
+      border-bottom: none;
+    }
+  }
+}
+
+.client-name-box {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.client-name {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.client-date {
+  font-size: 0.78rem;
+  color: var(--color-text-secondary);
+}
+
+.client-contact-box {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  font-size: 0.85rem;
+
+  .client-email {
+    color: var(--color-text);
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+
+    i {
+      font-size: 0.8rem;
+      color: var(--color-text-secondary);
+    }
+  }
+
+  .client-phone {
+    color: var(--color-text-secondary);
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+
+    i {
+      font-size: 0.8rem;
+      color: var(--color-text-secondary);
+    }
+  }
+}
+
+// Emblemas de Planos no Painel do Barbeiro
+.client-plan-badge-box {
+  display: flex;
+  align-items: center;
+}
+
+.admin-plan-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.35rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  white-space: nowrap;
+
+  i {
+    font-size: 0.85rem;
+  }
+
+  &--silver {
+    background-color: rgba(156, 163, 175, 0.1);
+    border: 1px solid rgba(156, 163, 175, 0.25);
+    color: #d1d5db;
+  }
+
+  &--gold {
+    background-color: rgba(250, 204, 21, 0.08);
+    border: 1px solid rgba(250, 204, 21, 0.25);
+    color: var(--color-accent);
+    box-shadow: 0 0 10px rgba(250, 204, 21, 0.06);
+  }
+
+  &--vip {
+    background-color: rgba(168, 85, 247, 0.12);
+    border: 1px solid rgba(168, 85, 247, 0.3);
+    color: #c084fc;
+    box-shadow: 0 0 10px rgba(168, 85, 247, 0.08);
+  }
+
+  &--none {
+    background-color: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    color: var(--color-text-secondary);
+  }
+}
+
+// Ações e Controles
+.client-actions-grid {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.select-wrapper {
+  position: relative;
+  
+  &::after {
+    content: '\f0d7';
+    font-family: 'Font Awesome 6 Free';
+    font-weight: 900;
+    position: absolute;
+    right: 0.875rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--color-text-secondary);
+    font-size: 0.8rem;
+    pointer-events: none;
+  }
+}
+
+.admin-plan-select {
+  appearance: none;
+  background-color: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  padding: 0.5rem 2.25rem 0.5rem 0.875rem;
+  color: var(--color-text);
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+  outline: none;
+  transition: all var(--transition);
+  color-scheme: dark;
+
+  &:hover, &:focus {
+    border-color: rgba(255, 255, 255, 0.15);
+    background-color: rgba(255, 255, 255, 0.02);
+  }
+
+  option {
+    background-color: var(--color-surface);
+    color: var(--color-text);
+    font-size: 0.85rem;
+  }
+}
+
+.cuts-adjustment-box {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  background-color: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  padding: 0.25rem 0.375rem;
+}
+
+.cuts-adjust-input {
+  width: 50px;
+  background: transparent;
+  border: none;
+  color: var(--color-text);
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-align: center;
+  outline: none;
+  
+  // Esconde setas do input number
+  &::-webkit-outer-spin-button,
+  &::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+}
+
+.btn-adjust-cuts {
+  background-color: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: var(--radius-sm);
+  color: var(--color-text);
+  padding: 0.35rem 0.75rem;
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition);
+
+  &:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.15);
+  }
+}
+
+// ── ESTILOS PREMIUM DO AGENDAMENTO ESPECIAL ──────────────────
+
+.admin-special-booking-btn {
+  padding: 0.5rem 1.25rem;
+  font-size: 0.875rem;
+  border-radius: var(--radius-sm);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  height: 38px;
+}
+
+.special-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.15rem 0.5rem;
+  border-radius: 12px;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  margin-left: 0.625rem;
+  vertical-align: middle;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+  transition: transform var(--transition);
+  cursor: default;
+
+  &:hover {
+    transform: translateY(-1px);
+  }
+
+  i {
+    font-size: 0.72rem;
+  }
+
+  &--idoso {
+    background-color: rgba(249, 115, 22, 0.1);
+    border: 1px solid rgba(249, 115, 22, 0.3);
+    color: #f97316;
+  }
+
+  &--pcd {
+    background-color: rgba(59, 130, 246, 0.1);
+    border: 1px solid rgba(59, 130, 246, 0.3);
+    color: #60a5fa;
+  }
+
+  &--vip {
+    background-color: rgba(250, 204, 21, 0.08);
+    border: 1px solid rgba(250, 204, 21, 0.3);
+    color: var(--color-accent);
+    box-shadow: 0 0 8px rgba(250, 204, 21, 0.15);
+  }
+
+  &--outro {
+    background-color: rgba(148, 163, 184, 0.08);
+    border: 1px solid rgba(148, 163, 184, 0.3);
+    color: #cbd5e1;
+  }
+}
+
+// Customizações específicas de timeline para os Badges
+.timeline-slot__client {
+  display: inline-flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+}
+
+// Customizações para o Seletor de Categorias no Modal
+.special-categories-picker {
+  width: 100%;
+}
+
+.category-picker-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  padding: 0.65rem 0.5rem;
+  background-color: rgba(255, 255, 255, 0.015);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: all var(--transition);
+  user-select: none;
+  position: relative;
+
+  i {
+    font-size: 1.25rem;
+    transition: transform var(--transition);
+  }
+
+  span {
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--color-text-secondary);
+    transition: color var(--transition);
+  }
+
+  &:hover {
+    background-color: rgba(255, 255, 255, 0.035);
+    border-color: rgba(255, 255, 255, 0.1);
+    
+    i {
+      transform: scale(1.1);
+    }
+  }
+
+  &--active {
+    background-color: rgba(250, 204, 21, 0.06) !important;
+    border-color: var(--color-accent) !important;
+    box-shadow: inset 0 0 10px rgba(250, 204, 21, 0.05), 0 4px 15px rgba(0, 0, 0, 0.2);
+
+    span {
+      color: var(--color-text);
+    }
+    
+    i {
+      transform: scale(1.15);
+    }
+  }
+}
+
+// ── ESTILOS DO MODAL GRANDE E FROSTED GLASS ──────────────────
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(4, 10, 22, 0.85);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+  z-index: 1100;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  animation: modalFadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.modal-card {
+  background: rgba(10, 20, 38, 0.95);
+  border: 1px solid rgba(29, 50, 85, 0.8);
+  border-radius: 24px;
+  width: 100%;
+  max-width: 560px;
+  padding: 1.75rem;
+  position: relative;
+  box-shadow: 0 30px 60px rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  animation: modalScaleIn 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+  display: flex;
+  flex-direction: column;
+  gap: 1.15rem;
+  
+  // Altura máxima e rolagem vertical do próprio modal
+  max-height: 90dvh;
+  overflow-y: auto;
+
+  // Customização premium da barra de rolagem do modal
+  &::-webkit-scrollbar {
+    width: 6px;
+  }
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  &::-webkit-scrollbar-thumb {
+    background-color: rgba(250, 204, 21, 0.15);
+    border-radius: 3px;
+    
+    &:hover {
+      background-color: rgba(250, 204, 21, 0.3);
+    }
+  }
+
+  @media (max-width: 640px) {
+    padding: 1.5rem 1rem;
+    gap: 1rem;
+    max-height: 95dvh;
+  }
+}
+
+.modal-close {
+  position: absolute;
+  top: 1.25rem;
+  right: 1.25rem;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 50%;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  transition: all 0.25s ease;
+  z-index: 10;
+
+  &:hover {
+    background-color: rgba(255, 255, 255, 0.08);
+    color: var(--color-text);
+    transform: rotate(90deg);
+  }
+}
+
+// Cabeçalho Modal
+.modal-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 0.5rem;
+}
+
+.modal-title {
+  font-family: var(--font-display);
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: var(--color-text);
+  margin: 0;
+  letter-spacing: 0.5px;
+}
+
+.modal-subtitle {
+  color: var(--color-text-secondary);
+  font-size: 0.9rem;
+  margin: 0;
+  line-height: 1.5;
+}
+
+.modal-body {
+  width: 100%;
+}
+
+.modal-actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: flex-end;
+  margin-top: 0.5rem;
+}
+
+// Keyframes Animations
+@keyframes modalFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes modalScaleIn {
+  from { opacity: 0; transform: scale(0.92); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+// ── Seção de Produtos Adicionados no Agendamento ────────────────
+.products-section {
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  padding-top: 0.875rem;
+  margin-top: 0.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+
+  .products-title {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--color-accent);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    margin: 0;
+  }
+
+  .products-list-edit {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .product-edit-row {
+    display: flex;
+    align-items: flex-end;
+    gap: 0.75rem;
+    width: 100%;
+
+    @media (max-width: 576px) {
+      flex-direction: column;
+      align-items: stretch;
+      gap: 0.5rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+      padding-bottom: 0.75rem;
+
+      &:last-child {
+        border-bottom: none;
+        padding-bottom: 0;
+      }
+    }
+  }
+
+  .product-input-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    flex: 1;
+
+    &--qty {
+      flex: 0 0 70px;
+    }
+
+    &--val {
+      flex: 0 0 110px;
+    }
+
+    @media (max-width: 576px) {
+      flex: 1 1 auto;
+      width: 100%;
+    }
+  }
+
+  .product-label {
+    font-size: 0.65rem;
+    font-weight: 600;
+    color: var(--color-text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    text-align: left;
+  }
+
+  .product-input {
+    width: 100%;
+    padding: 0.45rem 0.75rem;
+    background-color: rgba(255, 255, 255, 0.02);
+    border: 1.5px solid var(--color-border);
+    border-radius: 4px;
+    color: var(--color-text);
+    font-size: 0.85rem;
+    font-weight: 500;
+    transition: all var(--transition);
+
+    &:focus {
+      outline: none;
+      border-color: var(--color-accent);
+      background-color: rgba(255, 255, 255, 0.04);
+    }
+  }
+
+  .btn-remove-product-row {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    background-color: rgba(248, 113, 113, 0.06);
+    border: 1px solid rgba(248, 113, 113, 0.25);
+    border-radius: 4px;
+    color: #f87171;
+    cursor: pointer;
+    transition: all var(--transition);
+    flex-shrink: 0;
+
+    &--with-label {
+      margin-bottom: 0px;
+    }
+
+    &:hover {
+      background-color: #f87171;
+      color: #fff;
+      box-shadow: 0 0 8px rgba(248, 113, 113, 0.3);
+    }
+
+    @media (max-width: 576px) {
+      width: 100%;
+      height: 36px;
+      margin-top: 0.25rem;
+    }
+  }
+
+  .products-actions-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-top: 0.5rem;
+
+    @media (max-width: 576px) {
+      flex-direction: column;
+      align-items: stretch;
+    }
+  }
+
+  .btn-add-product-row {
+    padding: 0.45rem 1rem;
+    font-size: 0.8rem;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+
+    @media (max-width: 576px) {
+      width: 100%;
+      justify-content: center;
+    }
+  }
+
+  .btn-save-products {
+    padding: 0.45rem 1.5rem;
+    font-size: 0.8rem;
+    font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+
+    @media (max-width: 576px) {
+      width: 100%;
+      justify-content: center;
+    }
+  }
+}
+
+
+
+

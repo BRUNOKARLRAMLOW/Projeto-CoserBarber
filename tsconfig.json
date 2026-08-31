@@ -1,0 +1,60 @@
+/* To learn more about Typescript configuration file: https://www.typescriptlang.org/docs/handbook/tsconfig-json.html. */
+/* To learn more about Angular compiler options: https://angular.dev/reference/configs/angular-compiler-options. */
+{
+  "compileOnSave": false,
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@core/*": ["src/app/core/*"],
+      "@core/models": ["src/app/core/models/index.ts"],
+      "@core/services/*": ["src/app/core/services/*"],
+      "@home/*": ["projects/home/src/app/*"],
+      "@agenda/*": ["projects/agenda/src/app/*"],
+      "@contato/*": ["projects/contato/src/app/*"]
+    },
+    "strict": true,
+    "noImplicitOverride": true,
+    "noPropertyAccessFromIndexSignature": true,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
+    "skipLibCheck": true,
+    "isolatedModules": true,
+    "experimentalDecorators": true,
+    "importHelpers": true,
+    "target": "ES2022",
+    "module": "preserve"
+  },
+  "angularCompilerOptions": {
+    "enableI18nLegacyMessageIdFormat": false,
+    "strictInjectionParameters": true,
+    "strictInputAccessModifiers": true,
+    "strictTemplates": true
+  },
+  "files": [],
+  "references": [
+    {
+      "path": "./tsconfig.app.json"
+    },
+    {
+      "path": "./tsconfig.spec.json"
+    },
+    {
+      "path": "./projects/home/tsconfig.app.json"
+    },
+    {
+      "path": "./projects/home/tsconfig.spec.json"
+    },
+    {
+      "path": "./projects/agenda/tsconfig.app.json"
+    },
+    {
+      "path": "./projects/agenda/tsconfig.spec.json"
+    },
+    {
+      "path": "./projects/contato/tsconfig.app.json"
+    },
+    {
+      "path": "./projects/contato/tsconfig.spec.json"
+    }
+  ]
+}

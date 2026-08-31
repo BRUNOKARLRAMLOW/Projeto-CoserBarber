@@ -1,0 +1,188 @@
+<header class="shell-header" role="banner">
+  <div class="shell-header__inner">
+
+    <a routerLink="/home" class="shell-logo" aria-label="Coser Barber — Início" (click)="fecharMenu()">
+      <span class="shell-logo__coser">Coser</span>
+      <span class="shell-logo__coser">'s</span>
+      <span class="shell-logo__barber">Barber</span>
+    </a>
+
+    <nav class="shell-nav" [class.shell-nav--open]="menuAberto()" aria-label="Navegação principal">
+      <ul class="shell-nav__list" role="list">
+        <li>
+          <a routerLink="/home" routerLinkActive="shell-nav__link--active"
+             class="shell-nav__link" (click)="fecharMenu()">
+            Início
+          </a>
+        </li>
+        <li>
+          <a routerLink="/contato" routerLinkActive="shell-nav__link--active"
+             class="shell-nav__link" (click)="fecharMenu()">
+            Contato
+          </a>
+        </li>
+        <li>
+          <a routerLink="/agenda" routerLinkActive="shell-nav__link--active"
+             class="shell-nav__link shell-nav__link--cta" (click)="fecharMenu()">
+            <i class="fa-solid fa-scissors" aria-hidden="true"></i>
+            Agendar Horário
+          </a>
+        </li>
+        @if (authService.currentUser()) {
+          <li class="shell-nav__user-item account-menu-container">
+            <button (click)="toggleMenuConta()" class="shell-nav__user-btn" aria-haspopup="true" [attr.aria-expanded]="menuContaAberto()">
+              <span class="shell-nav__user-name">{{ authService.currentUser()?.displayName }}</span>
+              
+              <!-- Plan Symbol Representing Active Subscription -->
+              @if (authService.currentUser()?.plan === 'silver') {
+                <i class="fa-solid fa-star text-silver" aria-hidden="true" title="Plano Silver"></i>
+              } @else if (authService.currentUser()?.plan === 'gold') {
+                <i class="fa-solid fa-award text-gold" aria-hidden="true" title="Plano Gold"></i>
+              } @else if (authService.currentUser()?.plan === 'vip') {
+                <i class="fa-solid fa-crown text-vip" aria-hidden="true" title="Plano VIP"></i>
+              }
+              
+              <i class="fa-solid fa-chevron-down shell-nav__user-chevron" [class.shell-nav__user-chevron--open]="menuContaAberto()"></i>
+            </button>
+
+            <!-- Frosted Glass Dropdown Menu -->
+            <div class="shell-nav__dropdown" [class.shell-nav__dropdown--open]="menuContaAberto()">
+              <div class="shell-nav__dropdown-header">
+                <span class="shell-nav__dropdown-email">{{ authService.currentUser()?.email }}</span>
+                @if (authService.currentUser()?.plan && authService.currentUser()?.plan !== 'none') {
+                  <span class="header-plan-badge" [class]="'header-plan-badge--' + authService.currentUser()?.plan">
+                    {{ authService.currentUser()?.plan }}
+                  </span>
+                } @else {
+                  <span class="header-plan-badge header-plan-badge--none">Sem Plano</span>
+                }
+              </div>
+              <ul class="shell-nav__dropdown-list">
+                <li>
+                  <button (click)="abrirEditProfile()" class="shell-nav__dropdown-item">
+                    <i class="fa-solid fa-user-gear" aria-hidden="true"></i>
+                    Personalizar Conta
+                  </button>
+                </li>
+                @if (authService.currentUser()?.role === 'barber') {
+                  <li>
+                    <a routerLink="/admin" class="shell-nav__dropdown-item shell-nav__dropdown-item--admin" (click)="fecharMenuConta()">
+                      <i class="fa-solid fa-lock" aria-hidden="true"></i>
+                      Painel do Barbeiro
+                    </a>
+                  </li>
+                }
+                <li class="shell-nav__dropdown-divider"></li>
+                <li>
+                  <button (click)="logout()" class="shell-nav__dropdown-item shell-nav__dropdown-item--logout">
+                    <i class="fa-solid fa-right-from-bracket" aria-hidden="true"></i>
+                    Sair
+                  </button>
+                </li>
+              </ul>
+            </div>
+          </li>
+        } @else {
+          <li class="shell-nav__user-item">
+            <a routerLink="/login" routerLinkActive="shell-nav__link--active"
+               class="shell-nav__link shell-nav__link--login" (click)="fecharMenu()">
+              <i class="fa-solid fa-user" aria-hidden="true"></i>
+              Entrar
+            </a>
+          </li>
+        }
+      </ul>
+    </nav>
+
+    <button
+      class="shell-hamburger"
+      type="button"
+      (click)="toggleMenu()"
+      [attr.aria-expanded]="menuAberto()"
+      [attr.aria-label]="menuAberto() ? 'Fechar menu' : 'Abrir menu'"
+    >
+      <span class="shell-hamburger__bar"></span>
+      <span class="shell-hamburger__bar"></span>
+      <span class="shell-hamburger__bar"></span>
+    </button>
+
+  </div>
+</header>
+
+<!-- Customize Profile Frosted Glass Modal -->
+@if (showEditProfile()) {
+  <div class="edit-profile-backdrop" (click)="showEditProfile.set(false)" aria-hidden="true">
+    <div class="edit-profile-modal" (click)="$event.stopPropagation()">
+      <div class="edit-profile-modal__header">
+        <h3><i class="fa-solid fa-user-gear"></i> Personalizar Conta</h3>
+        <button class="edit-profile-modal__close-btn" (click)="showEditProfile.set(false)" aria-label="Fechar modal">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+      <div class="edit-profile-modal__body">
+        <form (ngSubmit)="salvarPerfil()" #profileForm="ngForm">
+          <div class="form-group">
+            <label for="edit-nome">Nome Completo</label>
+            <div class="input-with-icon">
+              <i class="fa-solid fa-user"></i>
+              <input
+                type="text"
+                id="edit-nome"
+                [ngModel]="editNome()"
+                (ngModelChange)="editNome.set($event)"
+                name="nome"
+                placeholder="Seu nome"
+                required
+                class="form-control"
+              />
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="edit-telefone">Telefone / WhatsApp</label>
+            <div class="input-with-icon">
+              <i class="fa-solid fa-phone"></i>
+              <input
+                type="text"
+                id="edit-telefone"
+                [ngModel]="editPhone()"
+                (ngModelChange)="editPhone.set($event)"
+                name="phone"
+                placeholder="(00) 99999-9999"
+                class="form-control"
+              />
+            </div>
+          </div>
+          <div class="edit-profile-modal__actions">
+            <button type="button" class="btn-cancel" (click)="showEditProfile.set(false)" [disabled]="isSavingProfile()">
+              Cancelar
+            </button>
+            <button type="submit" class="btn-submit" [disabled]="isSavingProfile() || !editNome().trim()">
+              @if (isSavingProfile()) {
+                <i class="fa-solid fa-circle-notch fa-spin"></i> Salvando...
+              } @else {
+                <i class="fa-solid fa-circle-check"></i> Salvar Alterações
+              }
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+}
+
+@if (menuAberto()) {
+  <div class="shell-overlay" (click)="fecharMenu()" aria-hidden="true"></div>
+}
+
+<main class="shell-main" id="main-content">
+  <router-outlet />
+</main>
+
+<footer class="shell-footer" role="contentinfo">
+  <p class="shell-footer__text">
+    &copy; {{ currentYear }} Coser Barber — Todos os direitos reservados.
+  </p>
+  <p class="shell-footer__text">
+    Desenvolvido por <a href="https://www.instagram.com/bruno.ramlow/" target="_blank" rel="noopener noreferrer">Bruno Karl Ramlow</a>
+  </p>
+</footer>

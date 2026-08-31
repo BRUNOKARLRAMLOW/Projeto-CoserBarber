@@ -1,0 +1,156 @@
+<div class="planos-page">
+  
+  <!-- Cabeçalho Principal -->
+  <header class="planos-header">
+    <div class="container header-container">
+      <a routerLink="/" class="back-link">
+        <i class="fa-solid fa-arrow-left" aria-hidden="true"></i> Voltar ao site
+      </a>
+      <h1 class="planos-title">Club <span>Coser Barber</span></h1>
+      <span class="accent-divider" aria-hidden="true"></span>
+      <p class="planos-subtitle">Assine um plano mensal e tenha acesso a cortes com descontos exclusivos ou ilimitados.</p>
+    </div>
+  </header>
+
+  <main class="container planos-body">
+    <div class="plans-grid">
+      @for (plan of plans; track plan.id) {
+        <div class="plan-card" [class]="'plan-card--' + plan.accentColor" [class.plan-card--active]="auth.currentUser()?.plan === plan.id">
+          
+          <!-- Selo de Plano Ativo -->
+          @if (auth.currentUser()?.plan === plan.id) {
+            <span class="active-badge"><i class="fa-solid fa-circle-check"></i> Seu Plano Ativo</span>
+          }
+
+          <div class="plan-card__header">
+            <div class="plan-card__icon">
+              <i class="fa-solid" 
+                 [class.fa-star]="plan.id === 'silver'" 
+                 [class.fa-award]="plan.id === 'gold'"
+                 [class.fa-user]="plan.id === 'none'"></i>
+            </div>
+            <h2 class="plan-card__name">{{ plan.name }}</h2>
+            <p class="plan-card__desc">{{ plan.description }}</p>
+          </div>
+
+          <div class="plan-card__price-box">
+            @if (plan.id === 'none') {
+              <span class="price-value">Avulso</span>
+              <span class="price-period">Sem mensalidade</span>
+            } @else {
+              <span class="price-value">{{ formatarPreco(plan.price) }}</span>
+              @if (plan.price > 0) {
+                <span class="price-period">/mês</span>
+              }
+            }
+          </div>
+
+          <ul class="plan-card__benefits">
+            @for (benefit of plan.benefits; track benefit) {
+              <li>
+                <i class="fa-solid fa-check benefit-check"></i>
+                <span>{{ benefit }}</span>
+              </li>
+            }
+          </ul>
+
+          <div class="plan-card__actions">
+            <!-- Caso A: Plano Ativo do Usuário -->
+            @if (auth.currentUser()?.plan === plan.id) {
+              <button type="button" class="btn-plan btn-plan--active" disabled>
+                <i class="fa-solid fa-check"></i>
+                {{ plan.id === 'none' ? 'Seu Status Atual' : 'Plano Ativo' }}
+              </button>
+            }
+            <!-- Caso B: Sem plano (Avulso) -->
+            @else if (plan.id === 'none') {
+              <a routerLink="/agenda" class="btn-plan btn-plan--buy" style="text-decoration: none;">
+                <i class="fa-solid fa-scissors"></i> Agendar Avulso
+              </a>
+            }
+            <!-- Caso C: Planos Assináveis (Silver/Gold) -->
+            @else {
+              <button type="button" class="btn-plan btn-plan--buy" (click)="abrirCheckout(plan.id)">
+                @if (auth.currentUser()) {
+                  {{ auth.currentUser()?.plan && auth.currentUser()?.plan !== 'none' ? 'Mudar para este Plano' : 'Assinar Plano' }}
+                } @else {
+                  Entrar para Assinar
+                }
+              </button>
+            }
+          </div>
+
+        </div>
+      }
+    </div>
+  </main>
+
+  <!-- ── MODAL DE CHECKOUT SIMULADO (PIX) ── -->
+  @if (showCheckout(); as open) {
+    <div class="modal-overlay" (click)="fecharCheckout()" role="dialog" aria-modal="true">
+      <div class="modal-card" (click)="$event.stopPropagation()">
+        
+        <button type="button" class="modal-close" (click)="fecharCheckout()" [disabled]="isProcessing() || successMessage()">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+
+        @if (!successMessage()) {
+          <div class="modal-header">
+            <h3 class="modal-title">Confirmar Assinatura</h3>
+            <p class="modal-subtitle">Você está assinando o <strong>Plano {{ selectedPlan?.name }}</strong></p>
+          </div>
+
+          <div class="modal-body">
+            <!-- Resumo do valor -->
+            <div class="checkout-summary">
+              <span>Valor Mensal:</span>
+              <strong class="checkout-price">{{ formatarPreco(selectedPlan?.price || 0) }}</strong>
+            </div>
+
+            <div class="pix-instructions">
+              <p class="pix-text">Pague via <strong>PIX</strong> para ativação imediata do seu plano:</p>
+              
+              <!-- QR Code Simulado -->
+              <div class="pix-qrcode-box">
+                <div class="pix-qrcode-placeholder">
+                  <i class="fa-solid fa-qrcode"></i>
+                  <span>QR Code Pix do Club Coser Barber</span>
+                </div>
+              </div>
+
+              <!-- Chave copia e cola -->
+              <div class="pix-copy-paste">
+                <input type="text" class="pix-key-input" value="00020101021226870014br.gov.bcb.pix2565coserbarberclubpix..." readonly>
+                <button type="button" class="btn-copy-pix" onclick="alert('Chave Pix copiada para a área de transferência!')">
+                  <i class="fa-solid fa-copy"></i> Copiar
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div class="modal-actions">
+            <button type="button" class="btn-confirm-pay" [disabled]="isProcessing()" (click)="confirmarAssinatura()">
+              @if (isProcessing()) {
+                <span class="loader"></span> Confirmando Pix...
+              } @else {
+                <i class="fa-solid fa-circle-check"></i> Já realizei o pagamento
+              }
+            </button>
+          </div>
+        } @else {
+          <!-- Tela de Sucesso -->
+          <div class="success-checkout">
+            <div class="success-checkout__icon">
+              <i class="fa-solid fa-champagne-glasses"></i>
+            </div>
+            <h3 class="success-checkout__title">Pagamento Confirmado!</h3>
+            <p class="success-checkout__text">{{ successMessage() }}</p>
+            <span class="success-checkout__badge"><i class="fa-solid fa-circle-check"></i> Plano Ativo</span>
+          </div>
+        }
+
+      </div>
+    </div>
+  }
+
+</div>
